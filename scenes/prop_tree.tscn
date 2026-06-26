@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://prop_tree"]
+
+[ext_resource type="PackedScene" uid="uid://entity25d" path="res://scenes/entity_25d.tscn" id="1_entity"]
+[ext_resource type="Script" path="res://scripts/prop_25d.gd" id="2_prop"]
+
+[node name="Tree" instance=ExtResource("1_entity")]
+script = ExtResource("2_prop")
+body_size = Vector2(36, 72)
+body_color = Color(0.28, 0.52, 0.24, 1)

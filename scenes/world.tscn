@@ -1,0 +1,53 @@
+[gd_scene load_steps=8 format=3 uid="uid://world25d"]
+
+[ext_resource type="Script" path="res://scripts/world_25d.gd" id="1_world"]
+[ext_resource type="Script" path="res://scripts/ground_grid.gd" id="2_ground"]
+[ext_resource type="PackedScene" uid="uid://player25d" path="res://scenes/player.tscn" id="3_player"]
+[ext_resource type="Script" path="res://scripts/camera_follow.gd" id="4_camera"]
+[ext_resource type="PackedScene" uid="uid://prop_tree" path="res://scenes/prop_tree.tscn" id="5_tree"]
+[ext_resource type="PackedScene" uid="uid://prop_rock" path="res://scenes/prop_rock.tscn" id="6_rock"]
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_world")
+
+[node name="Ground" type="Node2D" parent="."]
+z_index = -100
+script = ExtResource("2_ground")
+
+[node name="YSort" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Player" parent="YSort" instance=ExtResource("3_player")]
+
+[node name="TreeA" parent="YSort" instance=ExtResource("5_tree")]
+position = Vector2(180, 120)
+
+[node name="TreeB" parent="YSort" instance=ExtResource("5_tree")]
+position = Vector2(-220, 80)
+
+[node name="TreeC" parent="YSort" instance=ExtResource("5_tree")]
+position = Vector2(60, 260)
+
+[node name="RockA" parent="YSort" instance=ExtResource("6_rock")]
+position = Vector2(-100, 200)
+
+[node name="RockB" parent="YSort" instance=ExtResource("6_rock")]
+position = Vector2(280, -40)
+
+[node name="RockC" parent="YSort" instance=ExtResource("6_rock")]
+position = Vector2(-160, -120)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(1.75, 1.75)
+script = ExtResource("4_camera")
+target_path = NodePath("../YSort/Player")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Hint" type="Label" parent="UI"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 500.0
+offset_bottom = 40.0
+theme_override_colors/font_color = Color(0.9, 0.9, 0.85, 0.85)
+text = "WASD — walk behind / in front of props (2.5D depth)"
