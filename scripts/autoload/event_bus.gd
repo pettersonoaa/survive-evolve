@@ -1,0 +1,15 @@
+extends Node
+
+signal wolf_died(wolf: Node, cause: String)
+signal wolf_damaged(wolf: Node, amount: float)
+signal wolf_needs_critical(wolf: Node, need: String)
+signal mate_started(parent: Node, partner: Node)
+signal mate_completed(parent: Node, partner: Node, son: Node)
+signal gestation_tick(parent: Node, seconds_left: float)
+signal evolution_applied(parent: Node, node_id: String, display_name: String)
+signal succession_started(from_wolf: Node, to_wolf: Node)
+signal game_over(reason: String)
+signal lineage_complete(generation: int, apex_name: String)
+signal consume_food(wolf: Node, amount: float)
+signal consume_water(wolf: Node, amount: float)
+signal ui_toast(message: String, seconds: float)

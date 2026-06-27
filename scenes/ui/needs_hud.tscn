@@ -1,0 +1,49 @@
+[gd_scene load_steps=2 format=3 uid="uid://needs_hud"]
+
+[ext_resource type="Script" path="res://scripts/ui/needs_hud.gd" id="1_script"]
+
+[node name="NeedsHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 300.0
+offset_bottom = 120.0
+script = ExtResource("1_script")
+
+[node name="Panel" type="VBoxContainer" parent="."]
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 280.0
+offset_bottom = 160.0
+
+[node name="HealthLabel" type="Label" parent="Panel"]
+layout_mode = 2
+text = "Health: 100% — OK"
+
+[node name="HealthBar" type="ProgressBar" parent="Panel"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="HungerLabel" type="Label" parent="Panel"]
+layout_mode = 2
+text = "Hunger: 100% — OK"
+
+[node name="HungerBar" type="ProgressBar" parent="Panel"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="ThirstLabel" type="Label" parent="Panel"]
+layout_mode = 2
+text = "Thirst: 100% — OK"
+
+[node name="ThirstBar" type="ProgressBar" parent="Panel"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false

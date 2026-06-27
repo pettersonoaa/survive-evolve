@@ -1,0 +1,47 @@
+extends Control
+
+@onready var _gen_label: Label = $Panel/GenLabel
+@onready var _trait_label: Label = $Panel/TraitLabel
+@onready var _heir_label: Label = $Panel/HeirLabel
+@onready var _gestation_label: Label = $Panel/GestationLabel
+
+var _flash_time := 0.0
+
+
+func _ready() -> void:
+	EventBus.mate_completed.connect(_on_mate_completed)
+	EventBus.wolf_needs_critical.connect(_on_needs_critical)
+	EventBus.consume_food.connect(func(_w, a): EventBus.ui_toast.emit("+%.0f Hunger" % a, 1.2))
+	EventBus.consume_water.connect(func(_w, a): EventBus.ui_toast.emit("+%.0f Thirst" % a, 1.2))
+
+
+func _process(delta: float) -> void:
+	var wolf := GameState.player_wolf
+	if wolf != null and is_instance_valid(wolf):
+		_gen_label.text = "Gen: %d" % GameState.lineage.generation
+		_trait_label.text = "Trait: %s" % wolf.trait_display_name
+		GameState.prune_dead_heirs()
+		_heir_label.text = "Heirs: %d" % GameState.living_heirs.size()
+	if GameState.gestation_active:
+		_gestation_label.text = "Gestation: %ds (slow drain)" % int(ceil(GameState.gestation_time_left))
+		_gestation_label.visible = true
+	else:
+		_gestation_label.visible = false
+
+
+func _on_mate_completed(_parent: Node, _partner: Node, son: Node) -> void:
+	if son is Wolf:
+		var w: Wolf = son as Wolf
+		var tag := ""
+		if w.partner_genes_at_birth != null:
+			tag = w.partner_genes_at_birth.display_tag
+		EventBus.ui_toast.emit("Son ready: %s (%s)" % [w.trait_display_name, tag], 2.5)
+
+
+func _on_needs_critical(wolf: Node, need: String) -> void:
+	if wolf != GameState.player_wolf:
+		return
+	if need == "hunger":
+		EventBus.ui_toast.emit("Low hunger — find food!", 2.0)
+	else:
+		EventBus.ui_toast.emit("Low thirst — find water!", 2.0)

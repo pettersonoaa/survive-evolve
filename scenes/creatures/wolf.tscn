@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3 uid="uid://wolf_creature"]
+
+[ext_resource type="PackedScene" uid="uid://entity25d" path="res://scenes/entity_25d.tscn" id="1_entity"]
+[ext_resource type="Script" path="res://scripts/creatures/wolf.gd" id="2_wolf"]
+[ext_resource type="Script" path="res://scripts/components/needs_component.gd" id="3_needs"]
+
+[node name="Wolf" instance=ExtResource("1_entity")]
+script = ExtResource("2_wolf")
+
+[node name="NeedsComponent" type="Node" parent="."]
+script = ExtResource("3_needs")

@@ -1,53 +1,157 @@
-[gd_scene load_steps=8 format=3 uid="uid://world25d"]
+[gd_scene load_steps=22 format=3 uid="uid://world25d"]
 
 [ext_resource type="Script" path="res://scripts/world_25d.gd" id="1_world"]
 [ext_resource type="Script" path="res://scripts/ground_grid.gd" id="2_ground"]
-[ext_resource type="PackedScene" uid="uid://player25d" path="res://scenes/player.tscn" id="3_player"]
-[ext_resource type="Script" path="res://scripts/camera_follow.gd" id="4_camera"]
+[ext_resource type="PackedScene" uid="uid://player_wolf_scene" path="res://scenes/creatures/player_wolf.tscn" id="3_player"]
+[ext_resource type="Script" path="res://scripts/static_camera.gd" id="4_camera"]
+[ext_resource type="Script" path="res://scripts/world_content.gd" id="21_world_content"]
 [ext_resource type="PackedScene" uid="uid://prop_tree" path="res://scenes/prop_tree.tscn" id="5_tree"]
 [ext_resource type="PackedScene" uid="uid://prop_rock" path="res://scenes/prop_rock.tscn" id="6_rock"]
+[ext_resource type="PackedScene" uid="uid://partner_wolf_scene" path="res://scenes/creatures/partner_wolf.tscn" id="7_partner"]
+[ext_resource type="PackedScene" uid="uid://predator_wolf_scene" path="res://scenes/creatures/predator_wolf.tscn" id="8_pred"]
+[ext_resource type="PackedScene" uid="uid://water_source" path="res://scenes/resources/water_source.tscn" id="9_water"]
+[ext_resource type="PackedScene" uid="uid://food_carcass" path="res://scenes/resources/food_carcass.tscn" id="10_food"]
+[ext_resource type="PackedScene" uid="uid://needs_hud" path="res://scenes/ui/needs_hud.tscn" id="11_needs"]
+[ext_resource type="PackedScene" uid="uid://lineage_hud" path="res://scenes/ui/lineage_hud.tscn" id="12_lineage"]
+[ext_resource type="PackedScene" uid="uid://game_over_screen" path="res://scenes/ui/game_over_screen.tscn" id="13_over"]
+[ext_resource type="PackedScene" uid="uid://heir_picker" path="res://scenes/ui/heir_picker.tscn" id="14_heir"]
+[ext_resource type="PackedScene" uid="uid://debug_overlay" path="res://scenes/debug/debug_overlay.tscn" id="15_debug"]
+[ext_resource type="Script" path="res://scripts/systems/lineage_manager.gd" id="16_lineage"]
+[ext_resource type="Script" path="res://scripts/systems/run_manager.gd" id="17_run"]
+[ext_resource type="PackedScene" uid="uid://toast_layer" path="res://scenes/ui/toast_layer.tscn" id="18_toast"]
+[ext_resource type="PackedScene" uid="uid://interact_hint" path="res://scenes/ui/interact_hint.tscn" id="19_interact"]
+[ext_resource type="PackedScene" uid="uid://onboarding_hint" path="res://scenes/ui/onboarding_hint.tscn" id="20_onboard"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_world")
 
-[node name="Ground" type="Node2D" parent="."]
+[node name="WorldContent" type="Node2D" parent="."]
+script = ExtResource("21_world_content")
+
+[node name="Ground" type="Node2D" parent="WorldContent"]
 z_index = -100
 script = ExtResource("2_ground")
 
-[node name="YSort" type="Node2D" parent="."]
+[node name="YSort" type="Node2D" parent="WorldContent"]
 y_sort_enabled = true
 
-[node name="Player" parent="YSort" instance=ExtResource("3_player")]
+[node name="PlayerWolf" parent="WorldContent/YSort" instance=ExtResource("3_player")]
 
-[node name="TreeA" parent="YSort" instance=ExtResource("5_tree")]
+[node name="ForestPartner" parent="WorldContent/YSort" instance=ExtResource("7_partner")]
+position = Vector2(320, -180)
+archetype_id = "forest_wolf"
+
+[node name="PlainsPartner" parent="WorldContent/YSort" instance=ExtResource("7_partner")]
+position = Vector2(-420, 220)
+archetype_id = "plains_wolf"
+
+[node name="TundraPartner" parent="WorldContent/YSort" instance=ExtResource("7_partner")]
+position = Vector2(180, 480)
+archetype_id = "tundra_wolf"
+
+[node name="PredatorA" parent="WorldContent/YSort" instance=ExtResource("8_pred")]
+position = Vector2(-280, -320)
+
+[node name="PredatorB" parent="WorldContent/YSort" instance=ExtResource("8_pred")]
+position = Vector2(520, 360)
+
+[node name="WaterA" parent="WorldContent/YSort" instance=ExtResource("9_water")]
+position = Vector2(120, -120)
+
+[node name="WaterB" parent="WorldContent/YSort" instance=ExtResource("9_water")]
+position = Vector2(-360, 80)
+
+[node name="WaterC" parent="WorldContent/YSort" instance=ExtResource("9_water")]
+position = Vector2(400, 200)
+
+[node name="WaterD" parent="WorldContent/YSort" instance=ExtResource("9_water")]
+position = Vector2(-120, 420)
+
+[node name="WaterE" parent="WorldContent/YSort" instance=ExtResource("9_water")]
+position = Vector2(-200, -200)
+
+[node name="WaterF" parent="WorldContent/YSort" instance=ExtResource("9_water")]
+position = Vector2(300, 450)
+
+[node name="WaterG" parent="WorldContent/YSort" instance=ExtResource("9_water")]
+position = Vector2(-500, 300)
+
+[node name="WaterH" parent="WorldContent/YSort" instance=ExtResource("9_water")]
+position = Vector2(80, -300)
+
+[node name="FoodA" parent="WorldContent/YSort" instance=ExtResource("10_food")]
+position = Vector2(-180, -80)
+
+[node name="FoodB" parent="WorldContent/YSort" instance=ExtResource("10_food")]
+position = Vector2(260, 60)
+
+[node name="FoodC" parent="WorldContent/YSort" instance=ExtResource("10_food")]
+position = Vector2(-480, -160)
+
+[node name="FoodD" parent="WorldContent/YSort" instance=ExtResource("10_food")]
+position = Vector2(60, 300)
+
+[node name="FoodE" parent="WorldContent/YSort" instance=ExtResource("10_food")]
+position = Vector2(-60, -360)
+
+[node name="FoodF" parent="WorldContent/YSort" instance=ExtResource("10_food")]
+position = Vector2(480, -40)
+
+[node name="FoodG" parent="WorldContent/YSort" instance=ExtResource("10_food")]
+position = Vector2(-300, 350)
+
+[node name="FoodH" parent="WorldContent/YSort" instance=ExtResource("10_food")]
+position = Vector2(350, -250)
+
+[node name="FoodI" parent="WorldContent/YSort" instance=ExtResource("10_food")]
+position = Vector2(-80, 180)
+
+[node name="TreeA" parent="WorldContent/YSort" instance=ExtResource("5_tree")]
 position = Vector2(180, 120)
 
-[node name="TreeB" parent="YSort" instance=ExtResource("5_tree")]
+[node name="TreeB" parent="WorldContent/YSort" instance=ExtResource("5_tree")]
 position = Vector2(-220, 80)
 
-[node name="TreeC" parent="YSort" instance=ExtResource("5_tree")]
+[node name="TreeC" parent="WorldContent/YSort" instance=ExtResource("5_tree")]
 position = Vector2(60, 260)
 
-[node name="RockA" parent="YSort" instance=ExtResource("6_rock")]
+[node name="TreeD" parent="WorldContent/YSort" instance=ExtResource("5_tree")]
+position = Vector2(-340, -280)
+
+[node name="RockA" parent="WorldContent/YSort" instance=ExtResource("6_rock")]
 position = Vector2(-100, 200)
 
-[node name="RockB" parent="YSort" instance=ExtResource("6_rock")]
+[node name="RockB" parent="WorldContent/YSort" instance=ExtResource("6_rock")]
 position = Vector2(280, -40)
 
-[node name="RockC" parent="YSort" instance=ExtResource("6_rock")]
+[node name="RockC" parent="WorldContent/YSort" instance=ExtResource("6_rock")]
 position = Vector2(-160, -120)
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.75, 1.75)
+position_smoothing_enabled = false
+zoom = Vector2(1.35, 1.35)
 script = ExtResource("4_camera")
-target_path = NodePath("../YSort/Player")
+
+[node name="LineageManager" type="Node" parent="."]
+script = ExtResource("16_lineage")
+
+[node name="RunManager" type="Node" parent="."]
+script = ExtResource("17_run")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="Hint" type="Label" parent="UI"]
-offset_left = 16.0
-offset_top = 12.0
-offset_right = 500.0
-offset_bottom = 40.0
-theme_override_colors/font_color = Color(0.9, 0.9, 0.85, 0.85)
-text = "WASD — walk behind / in front of props (2.5D depth)"
+[node name="OnboardingHint" parent="UI" instance=ExtResource("20_onboard")]
+
+[node name="InteractHint" parent="UI" instance=ExtResource("19_interact")]
+
+[node name="NeedsHUD" parent="UI" instance=ExtResource("11_needs")]
+
+[node name="LineageHUD" parent="UI" instance=ExtResource("12_lineage")]
+
+[node name="GameOverScreen" parent="UI" instance=ExtResource("13_over")]
+
+[node name="HeirPicker" parent="UI" instance=ExtResource("14_heir")]
+
+[node name="ToastLayer" parent="." instance=ExtResource("18_toast")]
+
+[node name="DebugOverlay" parent="." instance=ExtResource("15_debug")]

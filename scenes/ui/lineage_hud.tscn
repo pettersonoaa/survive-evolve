@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3 uid="uid://lineage_hud"]
+
+[ext_resource type="Script" path="res://scripts/ui/lineage_hud.gd" id="1_script"]
+
+[node name="LineageHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -320.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 140.0
+grow_horizontal = 0
+script = ExtResource("1_script")
+
+[node name="Panel" type="VBoxContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="GenLabel" type="Label" parent="Panel"]
+layout_mode = 2
+text = "Gen: 0"
+
+[node name="TraitLabel" type="Label" parent="Panel"]
+layout_mode = 2
+text = "Trait: Grey Wolf"
+
+[node name="HeirLabel" type="Label" parent="Panel"]
+layout_mode = 2
+text = "Heirs: 0"
+
+[node name="GestationLabel" type="Label" parent="Panel"]
+layout_mode = 2
+visible = false
+text = "Gestation: 0s"

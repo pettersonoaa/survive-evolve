@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://son_wolf_scene"]
+
+[ext_resource type="PackedScene" uid="uid://wolf_creature" path="res://scenes/creatures/wolf.tscn" id="1_wolf"]
+[ext_resource type="Script" path="res://scripts/creatures/son_wolf.gd" id="2_son"]
+
+[node name="SonWolf" instance=ExtResource("1_wolf")]
+script = ExtResource("2_son")

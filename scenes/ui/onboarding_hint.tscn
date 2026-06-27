@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://onboarding_hint"]
+
+[ext_resource type="Script" path="res://scripts/ui/onboarding_hint.gd" id="1_script"]
+
+[node name="OnboardingHint" type="Control"]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 36.0
+grow_horizontal = 2
+script = ExtResource("1_script")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_right = -16.0
+theme_override_colors/font_color = Color(0.9, 0.9, 0.85, 0.9)
+autowrap_mode = 3
+text = "WASD move. Find food and water — press E."

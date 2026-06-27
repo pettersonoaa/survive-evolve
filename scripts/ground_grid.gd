@@ -3,7 +3,7 @@ extends Node2D
 
 
 @export var tile_size := 64
-@export var extent := 24
+@export var extent := 44
 
 const COLOR_A := Color(0.16, 0.21, 0.13, 1.0)
 const COLOR_B := Color(0.13, 0.17, 0.11, 1.0)

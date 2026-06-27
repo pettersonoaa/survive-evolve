@@ -1,0 +1,35 @@
+# Prototype status
+
+| Step | Done | Date | Notes |
+|------|------|------|-------|
+| STEP-01 | yes | 2026-06-27 | EventBus, GameState, EvolutionRegistry autoloads |
+| STEP-02 | yes | 2026-06-27 | WolfStats, WolfGenes, EvolutionNode, EvolutionTree, LineageRecord |
+| STEP-03 | yes | 2026-06-27 | NeedsComponent |
+| STEP-04–05 | yes | 2026-06-27 | Wolf + PlayerWolf |
+| STEP-06 | yes | 2026-06-27 | Finite water/food, E interact |
+| STEP-07 | yes | 2026-06-27 | NeedsHUD |
+| STEP-08–09 | yes | 2026-06-27 | 3 partners, gestation, SonWolf, multiple heirs |
+| STEP-10 | yes | 2026-06-27 | RunManager + heir picker |
+| STEP-11–12 | yes | 2026-06-27 | 34-node tree + mate-time evolution |
+| STEP-13–14 | yes | 2026-06-27 | LineageHUD + game over / victory |
+| STEP-15 | yes | 2026-06-27 | Debug overlay K/M/R |
+| Combat | yes | 2026-06-27 | PredatorWolf ×2 |
+| Polish pass | yes | 2026-06-27 | UX: interact hints, toasts, health bar, pause on modals, gestation fix |
+
+## Agent review (post-polish estimated)
+
+| Area | Before | After |
+|------|--------|-------|
+| Gameplay / design | 7/10 | ~8.5/10 |
+| UX / feedback | 5/10 | ~8/10 |
+| Technical stability | 6/10 | ~8/10 |
+
+## Playtest loop
+
+1. WASD — move grey wolf
+2. E at blue water / brown carcass — refill needs (one use each)
+3. Find wandering partner (forest grey, plains brown, tundra white)
+4. E to mate when both fed >50% — 60s gestation, trait rolled
+5. Son spawns — can have multiple heirs
+6. K debug or predators/needs — die → pick heir or game over
+7. Apex death with heir → lineage complete

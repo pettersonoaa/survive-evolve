@@ -1,0 +1,56 @@
+extends Wolf
+class_name SonWolf
+
+var _follow_target: Node2D = null
+var _follow_distance := 80.0
+
+
+func _ready() -> void:
+	is_player_controlled = false
+	is_heir = true
+	body_color = Color(0.62, 0.62, 0.65)
+	super._ready()
+	needs.set_process(false)
+	GameState.register_heir(self)
+	_follow_target = GameState.player_wolf
+
+
+func setup_from_birth(birth_stats: WolfStats, node_id: String, partner_genes: WolfGenes) -> void:
+	stats = birth_stats
+	current_node_id = node_id
+	trait_display_name = EvolutionResolver.get_display_name(node_id)
+	partner_genes_at_birth = partner_genes
+	health = stats.max_health
+	body_size = Vector2(20.0, 32.0)
+	if is_node_ready():
+		_body.color = body_color
+		_update_geometry()
+
+
+func _process(delta: float) -> void:
+	if is_dead:
+		return
+	super._process(delta)
+	if is_player_controlled:
+		return
+	if _follow_target == null or not is_instance_valid(_follow_target):
+		_follow_target = GameState.player_wolf
+	if _follow_target == null:
+		return
+	var offset := _follow_target.global_position - global_position
+	if offset.length() > _follow_distance:
+		global_position += offset.normalized() * stats.move_speed * 0.65 * delta
+
+
+func promote_to_player() -> void:
+	var heir_global := global_position
+	var world_content := get_tree().get_first_node_in_group("world_content") as Node2D
+	if world_content != null:
+		world_content.position -= heir_global
+		global_position = Vector2.ZERO
+	is_player_controlled = true
+	is_heir = false
+	GameState.unregister_heir(self)
+	GameState.player_wolf = self
+	body_color = Color(0.55, 0.55, 0.58)
+	_body.color = body_color

@@ -22,9 +22,23 @@ A **2.5D** roguelike / survivor game inspired by the depth and pixel look of [Ro
 
 ## Run the prototype
 
-1. Open this folder in Godot (`project.godot`).
+1. Open this folder in Godot 4.7 (`project.godot`).
 2. Press **F5**.
-3. **WASD** to move — walk around props and notice depth sorting.
+3. **WASD** — move | **E** — interact (food, water, mate)
+
+### Controls
+
+| Key | Action |
+|-----|--------|
+| WASD / arrows | Move |
+| E | Eat, drink, or mate (nearest target) |
+| K | Debug: kill player |
+| R | Debug: refill needs |
+| M | Debug: force mate |
+
+### Prototype loop
+
+Survive hunger/thirst → find a wandering partner (forest/plains/tundra) → mate (60s gestation) → son born with evolution trait → die → play as heir → repeat or game over without heirs.
 
 ## Layout
 

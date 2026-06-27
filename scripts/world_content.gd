@@ -2,4 +2,4 @@ extends Node2D
 
 
 func _ready() -> void:
-	GameState.reset_for_new_run()
+	add_to_group("world_content")

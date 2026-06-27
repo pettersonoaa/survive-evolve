@@ -1,25 +1,38 @@
-# Design decisions needed from you
+# Design decisions — LOCKED
 
-**Purpose:** Answer these so agents can implement without guessing.  
-**How to use:** Fill in `YOUR ANSWER:` under each item (or pick A/B/C). When done, tell agents: *"Follow docs/DESIGN_DECISIONS.md"*.
+**Status:** Decisions locked (2026-06-27)  
+**Owner:** Renata  
+**Purpose:** Agents implement from this file — do not guess.
 
-**Legend**
-- 🔴 **Blocks agents now** — needed before STEP-08 or affects core loop
-- 🟡 **Blocks later** — needed before STEP-11/12 or tuning
-- 🟢 **Optional** — agents use listed default if you skip
+Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 
 ---
 
-## Quick path (if you want to unblock today)
+## Summary (your vision)
 
-Answer only the **5 bold questions** in §A; accept **recommended defaults** everywhere else.
+| Pillar | Choice |
+|--------|--------|
+| **Lineage** | Multiple sons; on death pick which to play |
+| **Heir loss** | Son dies → parent continues, can remate |
+| **Chain** | Each generation must mate before dying or game over |
+| **Evolution** | At **mate time** (gestation ~60s), per-wolf tree position |
+| **Victory** | Reach max evolution node → lineage “complete” (game over win) |
+| **Survival** | Press **E** to eat/drink; finite resources, no respawn |
+| **Combat** | Starvation, dehydration, **and** predators/combat in v1 |
+| **World** | Wandering partners, larger map, **30+ node** evolution DAG |
 
-| # | Question | Recommended default |
-|---|----------|---------------------|
-| **A1** | One son or many? | **One son** — remating does nothing |
-| **A2** | When does evolution happen? | **On your death**, auto-roll, son gets trait |
-| **A3** | Son dies before you — then what? | **Game over** (lineage ends) |
-| **A4** | Eat/drink how? | **Walk over** resource (auto) |
+**Note for agents:** This diverges from `PROTOTYPE_PLAN.md` defaults (1 son, evolution on death, auto-consume). **This file wins** when they conflict. Update `PROTOTYPE_PLAN.md` / `GAME_CONCEPT.md` during implementation.
+
+---
+
+## Quick path (filled — reference only)
+
+| # | Question | Your answer |
+|---|----------|-------------|
+| **A1** | One son or many? | **Multiple** — pick heir on death |
+| **A2** | When does evolution happen? | **At mate** — son born with trait after gestation |
+| **A3** | Son dies before you — then what? | **Remate** — parent continues |
+| **A4** | Eat/drink how? | **Press E** at resource |
 | **A5** | Mate how? | **Press E** when near fed partner |
 
 ---
@@ -30,15 +43,13 @@ Answer only the **5 bold questions** in §A; accept **recommended defaults** eve
 
 **Blocks:** STEP-08, STEP-09, STEP-10
 
-**Context:** Plan assumes one heir. Multiple sons changes UI, succession, and game-over rules.
-
 | Option | Behavior |
 |--------|----------|
-| **A** | **One son per player life.** Mate once; remate ignored or blocked. |
-| **B** | **One living heir at a time.** New mate replaces old son. |
-| **C** | **Multiple sons.** On death, you pick which son to play (needs UI). |
+| **A** | One son per player life. |
+| **B** | One living heir at a time. |
+| **C** | **Multiple sons.** On death, pick which son to play. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **C** — Multiple sons per life. On player death, show heir picker UI (list living sons). Remating can add more sons over time. Sons that already exist stay in the world as NPCs until selected or they die.
 
 ---
 
@@ -48,11 +59,11 @@ Answer only the **5 bold questions** in §A; accept **recommended defaults** eve
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Game over immediately** — lineage broken. |
-| **B** | **Parent continues;** can mate again for a new heir. |
-| **C** | **Son respawns** at den (needs den system — out of prototype scope). |
+| **A** | Game over immediately. |
+| **B** | **Parent continues;** can mate again. |
+| **C** | Son respawns at den. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **B** — Parent continues playing. Dead son is removed from heir list. Player may mate again (after gestation rules) to produce a new heir. Game over only if player dies with **no living sons** (see DEC-01 picker).
 
 ---
 
@@ -62,11 +73,11 @@ Answer only the **5 bold questions** in §A; accept **recommended defaults** eve
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Need a grandson** — son must mate before death or game over. |
-| **B** | **Son can die without heir** — game over (prototype stays 1 mate → 1 succession demo). |
-| **C** | **Infinite chain** — son auto-spawns a generic heir at age X (no mate required). |
+| **A** | **Need a grandson** — must mate before death. |
+| **B** | Son can die without heir. |
+| **C** | Infinite chain with auto-heir. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **A** — Every controlled wolf (any generation) must have at least one living offspring before death, or **game over (`no_heir`)**. Playing as son: mate during gestation window → grandson exists → on son death, pick grandson (or game over if none). Same rule applies for grandson, great-grandson, etc.
 
 ---
 
@@ -76,11 +87,11 @@ Answer only the **5 bold questions** in §A; accept **recommended defaults** eve
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Automatic on death** — weighted roll, son spawns in with new stats (plan default). |
-| **B** | **Player picks** from 2–3 rolled options (roguelike draft). |
-| **C** | **Evolution happens at mate time** — son born with trait; death only transfers control. |
+| **A** | Automatic on death. |
+| **B** | Player picks from rolled options. |
+| **C** | **At mate time** — son gets trait; death only transfers control. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **C** — On successful mate (E press + requirements met), roll evolution **immediately** and store trait on pending offspring. After **gestation (~60s)** (DEC-09), son spawns with rolled stats/trait applied. Death does **not** roll evolution; it only triggers succession / heir picker.
 
 ---
 
@@ -88,29 +99,27 @@ Answer only the **5 bold questions** in §A; accept **recommended defaults** eve
 
 **Blocks:** STEP-11, STEP-12
 
-**Context:** When you die and roll `keen_nose`, does the whole lineage stay at `keen_nose` for future deaths?
-
 | Option | Behavior |
 |--------|----------|
-| **A** | **Lineage-wide tree position** — `current_node_id` is shared; each death advances one node along tree. |
-| **B** | **Per individual** — son has own branch state; tree is personal. |
-| **C** | **Hybrid** — lineage position advances, but son only inherits *some* stat deltas. |
+| **A** | Lineage-wide tree position. |
+| **B** | **Per individual** — each wolf has own branch state. |
+| **C** | Hybrid. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **B** — Each wolf stores `current_node_id` on their `WolfGenes` / individual record. Mate roll uses **parent’s** node + **partner’s** `branch_weights`. Son starts at rolled child node; siblings can diverge if parents remate with different partners.
 
 ---
 
-### DEC-06 — At max evolution node (`ancient_wolf`), further deaths…
+### DEC-06 — At max evolution node (`ancient_wolf` or final tier), further deaths…
 
 **Blocks:** STEP-12
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Stay at max** — no more trait gains, still play succession. |
-| **B** | **Reroll root branches** — sideways mutation. |
-| **C** | **Game over** — lineage “completed”. |
+| **A** | Stay at max — no more traits. |
+| **B** | Reroll root branches. |
+| **C** | **Game over** — lineage completed. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **C** — When a wolf at the **final tree node** dies (with valid heir succession resolved), show **lineage complete** screen (victory), not failure. Distinct from `no_heir` game over (DEC-19).
 
 ---
 
@@ -120,29 +129,25 @@ Answer only the **5 bold questions** in §A; accept **recommended defaults** eve
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **One fixed partner** on map (plan default). |
-| **B** | **Wandering partner** — must chase before mate. |
-| **C** | **Partner at den** — go to landmark first. |
+| **A** | Fixed partner on map. |
+| **B** | **Wandering partner** — chase before mate. |
+| **C** | Partner at den. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **B** — Partner wolf wanders the map (random direction every 2–4s). Player must find and catch them. Prototype: spawn **2–3** wandering partners (one per archetype: forest, plains, tundra) or random archetype per spawn.
 
 ---
 
 ### DEC-08 — Mate requirements
 
-**Blocks:** STEP-08 tuning
-
-Confirm or change thresholds:
-
 | Requirement | Plan default | Your value |
 |-------------|--------------|------------|
-| Player hunger min | > 50% | |
-| Player thirst min | > 50% | |
-| Partner hunger min | > 50% | |
-| Proximity | 48 px | |
-| Input | Press **E** | |
+| Player hunger min | > 50% | **> 50%** |
+| Player thirst min | > 50% | **> 50%** |
+| Partner hunger min | > 50% | **> 50%** |
+| Proximity | 48 px | **48 px** |
+| Input | Press **E** | **E** |
 
-**YOUR ANSWER (ok to write “defaults”):**
+**YOUR ANSWER:** **Defaults** — all thresholds as above. **E** is shared with resource interact (DEC-12); context resolves target (nearest valid interactable).
 
 ---
 
@@ -150,25 +155,31 @@ Confirm or change thresholds:
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Instant son** on successful E press (prototype). |
-| **B** | **Gestation timer** (e.g. 60s) — son spawns later. |
-| **C** | **Return to den** to birth. |
+| **A** | Instant son. |
+| **B** | **Gestation ~60s** — son spawns later. |
+| **C** | Return to den to birth. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **B** — After mate, **60 second gestation**. During gestation: parent can still move/fight/survive; optional UI timer. Son spawns at parent position when timer ends, with evolution from DEC-04 already applied. Only one active gestation per parent at a time.
 
 ---
 
 ### DEC-10 — Partner genetics in prototype
 
-**Blocks:** STEP-11 (partner presets)
-
 | Option | Behavior |
 |--------|----------|
-| **A** | **One partner type** — `forest_wolf` genes baked in. |
-| **B** | **Two partner types** — different `branch_weights` (more authoring). |
-| **C** | **Random partner genes** each run. |
+| **A** | One partner type. |
+| **B** | **Multiple partner types** — different `branch_weights`. |
+| **C** | Random partner genes each run. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **B** — Three wandering partner archetypes with distinct `WolfGenes.branch_weights`:
+
+| archetype | UI tag | Bias | Placeholder color |
+|-----------|--------|------|-------------------|
+| `forest_wolf` | *Forest blood* | Senses, metabolism, scavenger | Cinza / preto — `Color(0.42, 0.42, 0.45)` |
+| `plains_wolf` | *Plains blood* | Mobility, pack, sprint | Marrom / bege — `Color(0.58, 0.44, 0.32)` |
+| `tundra_wolf` | *Tundra blood* | Physique, winter survival | Branco — `Color(0.93, 0.94, 0.96)` |
+
+Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. Full weights in `docs/EVOLUTION_TREE_WOLF.md`.
 
 ---
 
@@ -176,10 +187,10 @@ Confirm or change thresholds:
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **No** — only `branch_weights` affect evolution roll (simpler). |
-| **B** | **Yes** — also multiply son base stats at birth. |
+| **A** | No — only `branch_weights`. |
+| **B** | **Yes** — multiply son base stats at birth. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **B** — `stat_bias` applies to son’s base `WolfStats` at birth (after evolution roll). Example: `{"move_speed": 1.1}` → son 10% faster before trait deltas.
 
 ---
 
@@ -189,11 +200,11 @@ Confirm or change thresholds:
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Auto on overlap** (plan default). |
+| **A** | Auto on overlap. |
 | **B** | **Press E** at resource. |
-| **C** | **Auto eat / manual drink** (split). |
+| **C** | Auto eat / manual drink. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **B** — Stand within interact range of `FoodCarcass` / `WaterSource`, press **E**. Same key as mate; nearest eligible target wins. Show interact hint when in range.
 
 ---
 
@@ -201,39 +212,33 @@ Confirm or change thresholds:
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Infinite** — carcass/puddle never depletes (prototype). |
-| **B** | **Finite** — each node one use, respawn after N seconds. |
-| **C** | **Finite, no respawn** — must find next node (harder). |
+| **A** | Infinite. |
+| **B** | Finite with respawn. |
+| **C** | **Finite, no respawn** — find next node. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **C** — Each resource node **one use** then depleted (hidden or greyed out). No respawn in prototype. Map must have enough scattered nodes for a full gestation + mate loop (favors **larger map**, DEC-21).
 
 ---
 
 ### DEC-14 — What kills the wolf in the prototype?
 
-Check all that apply for v1:
-
-- [ ] Starvation (hunger → 0)
-- [ ] Dehydration (thirst → 0)
-- [ ] Combat / predators (out of scope unless checked)
-- [ ] Debug key only for testing
-
 **YOUR ANSWER:**
+
+- [x] Starvation (hunger → 0)
+- [x] Dehydration (thirst → 0)
+- [x] **Combat / predators** — include basic predator or hostile NPC damage in v1 (STEP-21+ or parallel combat step)
+- [x] Debug key **K** for testing (STEP-15)
 
 ---
 
 ### DEC-15 — Target time until critical needs (tuning)
 
-**Blocks:** STEP-03 balancing
-
-Rough target from spawn until hunger/thirst hit “critical” (25%) with no eating:
-
 | | Plan default | Your target |
 |---|--------------|-------------|
-| Hunger | ~67 seconds | |
-| Thirst | ~50 seconds | |
+| Hunger | ~67 seconds | **~67 seconds** |
+| Thirst | ~50 seconds | **~50 seconds** |
 
-**YOUR ANSWER (ok to write “defaults”):**
+**YOUR ANSWER:** **Defaults** — tune in STEP-03; finite resources (DEC-13) make these timings matter more.
 
 ---
 
@@ -241,15 +246,7 @@ Rough target from spawn until hunger/thirst hit “critical” (25%) with no eat
 
 ### DEC-16 — Approve example tree or replace?
 
-Plan proposes 7 nodes: `wolf_base` → `keen_nose` / `long_legs` → … → `ancient_wolf`.
-
-| Option | Behavior |
-|--------|----------|
-| **A** | **Approve as-is** — agents implement §5 of PROTOTYPE_PLAN.md |
-| **B** | **Approve structure, I’ll rename/flavor** — provide names later |
-| **C** | **I’ll provide custom tree** — paste table before STEP-11 |
-
-**YOUR ANSWER:**
+**YOUR ANSWER:** **Custom — minimum 30 nodes.** Do **not** use the 7-node example as-is. Expand `wolf_tree` into a **branching DAG** with ≥30 `EvolutionNode`s, multiple mid-tier branches, 2–3 merge nodes, and 1–2 final “apex” nodes (e.g. `ancient_wolf` line). Keep §5 of `PROTOTYPE_PLAN.md` as **structural inspiration** only. Author in `data/evolution/wolf_tree.tres` before STEP-12.
 
 ---
 
@@ -257,11 +254,11 @@ Plan proposes 7 nodes: `wolf_base` → `keen_nose` / `long_legs` → … → `an
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Branching DAG** — choices matter (plan). |
-| **B** | **Single linear path** — no partner influence needed |
-| **C** | **Wide shallow tree** — many tier-1 traits, few merges |
+| **A** | **Branching DAG** — choices matter. |
+| **B** | Single linear path. |
+| **C** | Wide shallow tree. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **A** — Branching DAG required for 30+ nodes. Partner `branch_weights` bias which child nodes are likely at mate roll (DEC-04).
 
 ---
 
@@ -269,25 +266,29 @@ Plan proposes 7 nodes: `wolf_base` → `keen_nose` / `long_legs` → … → `an
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Hidden** — players learn by experimenting |
-| **B** | **Show partner tags** in UI (“Forest blood: favors Keen Nose”) |
-| **C** | **Show on death** — evolution screen shows weights |
+| **A** | Hidden. |
+| **B** | **Show partner tags** in UI. |
+| **C** | Show on death only. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **B** — Label wandering partners (e.g. “Forest blood”, “Plains blood”, “Tundra blood”). On son birth after gestation, briefly show rolled trait name + partner influence.
 
 ---
 
-## §E — Presentation & session (🟢 defaults ok)
+## §E — Presentation & session (🟢)
 
 ### DEC-19 — Game over vs “lineage complete”
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Same screen** — “Lineage ended: no heir” |
-| **B** | **Different screens** for no heir vs voluntary end |
-| **C** | **Stats summary** — generations reached, traits unlocked |
+| **A** | Same screen. |
+| **B** | Different screens per reason. |
+| **C** | **Stats summary** — generations, traits. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **C** — **Three outcomes, distinct copy:**
+
+1. **`no_heir`** — failure; stats summary (gens reached, traits seen).
+2. **`lineage_complete`** — victory at max node (DEC-06); stats + “Ancient lineage”.
+3. **Restart** from either screen (DEC-20).
 
 ---
 
@@ -295,10 +296,10 @@ Plan proposes 7 nodes: `wolf_base` → `keen_nose` / `long_legs` → … → `an
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Full reset** — generation 0, tree at `wolf_base` (prototype). |
-| **B** | **Meta unlocks persist** (needs meta system — not in prototype). |
+| **A** | **Full reset** — gen 0, fresh map resources. |
+| **B** | Meta unlocks persist. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **A** — Full reset on restart. No meta persistence in prototype.
 
 ---
 
@@ -306,25 +307,25 @@ Plan proposes 7 nodes: `wolf_base` → `keen_nose` / `long_legs` → … → `an
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Single small arena** — current `world.tscn` grid |
-| **B** | **Larger map** — agents expand `ground_grid` extent |
-| **C** | **Procedural map** — defer to post-prototype |
+| **A** | Small arena. |
+| **B** | **Larger map** — expand `ground_grid`. |
+| **C** | Procedural map. |
 
-**YOUR ANSWER:**
+**YOUR ANSWER:** **B** — Expand `ground_grid` extent (suggest **40–48** tiles radius vs current 24). Scatter more finite resources and wandering partners. Procedural deferred.
 
 ---
 
-## §F — Controls (🟢 confirm keys)
+## §F — Controls
 
 | Action | Default | Your key |
 |--------|---------|----------|
-| Move | WASD + arrows | |
-| Interact (mate) | E | |
-| Debug kill | K | |
-| Debug mate | M | |
-| Debug refill | R | |
+| Move | WASD + arrows | **WASD + arrows** |
+| Interact (mate, eat, drink) | E | **E** |
+| Debug kill | K | **K** |
+| Debug mate | M | **M** |
+| Debug refill | R | **R** |
 
-**YOUR ANSWER (ok to write “defaults”):**
+**YOUR ANSWER:** **Defaults** — add `interact` action (E) in `project.godot` at STEP-06/08.
 
 ---
 
@@ -332,19 +333,20 @@ Plan proposes 7 nodes: `wolf_base` → `keen_nose` / `long_legs` → … → `an
 
 | Decision | Unblocks |
 |----------|----------|
-| DEC-01, 02, 03, 04, 05 | STEP-08–10, 12–14 (succession rules) |
-| DEC-06 | STEP-12 (edge case) |
-| DEC-07–11 | STEP-08, 11–12 (partner & genetics) |
-| DEC-12–15 | STEP-03, 06 (needs & resources) |
-| DEC-16–18 | STEP-11–13 (tree & UI) |
-| DEC-19–21 | STEP-14, 16 (polish) |
+| DEC-01, 02, 03, 04, 05 | STEP-08–10, 12–14 (succession + heir picker) |
+| DEC-06 | STEP-12, STEP-14 (victory path) |
+| DEC-07–11 | STEP-08, 11–12 (wandering partners, gestation, genetics) |
+| DEC-12–15 | STEP-03, 06 (needs, E-interact, finite resources) |
+| DEC-14 | Combat / predator step (new or STEP-21 early) |
+| DEC-16–18 | STEP-11–13 (30+ node tree, partner UI) |
+| DEC-19–21 | STEP-14, 16 (screens, map size) |
 
-**Agents may start STEP-01–07** using recommended defaults while you decide §A–§C.
+**Agents:** All sections answered. Start STEP-01; revise `PROTOTYPE_PLAN.md` where this doc overrides it.
 
 ---
 
 ## After you answer
 
-1. Fill answers in this file.
+1. ~~Fill answers in this file.~~ **Done.**
 2. Message: *“Decisions locked — see DESIGN_DECISIONS.md”*
 3. Agents copy final rules into `docs/GAME_CONCEPT.md` during STEP-16.
