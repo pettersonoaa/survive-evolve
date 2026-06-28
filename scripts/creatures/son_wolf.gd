@@ -14,6 +14,7 @@ func _ready() -> void:
 	needs.refill()
 	GameState.register_heir(self)
 	_follow_target = GameState.player_wolf
+	EventBus.pack_assist_requested.connect(_on_pack_assist_requested)
 
 
 func setup_from_birth(birth_stats: WolfStats, node_id: String, partner_genes: WolfGenes) -> void:
@@ -40,7 +41,18 @@ func _follow_as_heir(delta: float) -> void:
 			return
 	var offset := _follow_target.global_position - global_position
 	if offset.length() > _follow_distance:
+		_last_move_dir = offset.normalized()
 		global_position += offset.normalized() * stats.move_speed * 0.65 * delta
+	else:
+		_last_move_dir = Vector2.ZERO
+
+
+func _on_pack_assist_requested(attacker: Node, target: Node) -> void:
+	if is_dead or not is_heir or attacker != GameState.player_wolf:
+		return
+	if not target.has_method("receive_bite"):
+		return
+	_try_attack(target)
 
 
 func promote_to_player() -> void:

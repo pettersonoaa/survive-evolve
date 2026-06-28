@@ -23,6 +23,11 @@
 | STEP-24 | yes | 2026-06-27 | Tundra + Desert biome zones, Desert blood partner |
 | STEP-25 | yes | 2026-06-27 | Main menu: Continue / New lineage |
 | STEP-26 | yes | 2026-06-27 | Map extent 48 (DEC-21), game over returns to menu |
+| STEP-27 | yes | 2026-06-27 | Wolf sprite atlas pipeline + assets/sprites/wolf drop-in |
+| STEP-28 | yes | 2026-06-27 | Idle/walk AnimatedSprite2D, flip on facing |
+| STEP-29 | yes | 2026-06-27 | Food/water respawn after 90s |
+| STEP-30 | yes | 2026-06-27 | Day/night CanvasModulate cycle (180s) |
+| STEP-31 | yes | 2026-06-27 | Pack assist — heirs + gestation partner join bites |
 
 ## Agent review (post-polish estimated)
 

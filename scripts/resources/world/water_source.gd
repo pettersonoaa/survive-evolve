@@ -24,4 +24,5 @@ func handle_interact(player) -> bool:
 	EventBus.consume_water.emit(player, drink_amount)
 	depleted = true
 	modulate = Color(0.5, 0.5, 0.5, 0.35)
+	EventBus.resource_depleted.emit(self)
 	return true

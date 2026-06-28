@@ -4,7 +4,7 @@ extends RefCounted
 ## Procedural top-down wolf pixels until real Aseprite sheets (STEP-20).
 
 
-static func create(body_color: Color, body_size: Vector2) -> ImageTexture:
+static func create(body_color: Color, body_size: Vector2, leg_offset: int = 0) -> ImageTexture:
 	var w := maxi(int(body_size.x), 12)
 	var h := maxi(int(body_size.y), 16)
 	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
@@ -16,7 +16,9 @@ static func create(body_color: Color, body_size: Vector2) -> ImageTexture:
 
 	# Feet row
 	for x in range(cx - 2, cx + 3):
-		_paint(img, x, h - 1, dark)
+		_paint(img, x + leg_offset, h - 1, dark)
+		if leg_offset != 0:
+			_paint(img, x - leg_offset, h - 2, dark)
 
 	# Body
 	for y in range(h / 3, h - 1):

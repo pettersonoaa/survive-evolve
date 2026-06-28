@@ -35,8 +35,10 @@ func _process(delta: float) -> void:
 	var offset := target.global_position - global_position
 	var dist := offset.length()
 	if dist < GameConstants.PREDATOR_AGGRO_RANGE and dist > 28.0:
+		_last_move_dir = offset.normalized()
 		global_position += offset.normalized() * stats.move_speed * chase_speed_mult * delta
 	elif dist <= 28.0 and _cooldown <= 0.0:
+		_last_move_dir = Vector2.ZERO
 		target.take_damage(contact_damage, "predator")
 		_cooldown = attack_cooldown
 

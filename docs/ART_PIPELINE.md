@@ -32,7 +32,7 @@ assets/
 
 ## Placeholder phase
 
-Current prototype uses colored `Polygon2D` blocks in `entity_25d.tscn`. Swap to `Sprite2D` when the first painted sheet exists — no scene structure change required.
+Current prototype uses procedural multi-frame atlases via `WolfSpriteAtlas`. Drop `assets/sprites/wolf/wolf_sheet.png` (8 frames: 4 idle + 4 walk) to swap in painted art without scene changes.
 
 ### Partner wolf placeholder colors
 

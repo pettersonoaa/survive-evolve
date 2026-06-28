@@ -596,6 +596,11 @@ World (world_25d.gd)
 | STEP-24 | Second biome + second partner archetype |
 | STEP-25 | Main menu (Continue / New lineage) |
 | STEP-26 | Expanded map scope (DEC-21) |
+| STEP-27 | Sprite atlas pipeline (Aseprite drop-in) |
+| STEP-28 | Idle / walk animation |
+| STEP-29 | Resource respawn |
+| STEP-30 | Day / night cycle |
+| STEP-31 | Pack assist combat |
 
 ---
 

@@ -11,6 +11,7 @@ var health: float = 100.0
 var is_dead: bool = false
 var partner_genes_at_birth: WolfGenes = null
 var _attack_cooldown := 0.0
+var _last_move_dir := Vector2.ZERO
 
 @onready var needs: NeedsComponent = $NeedsComponent
 
@@ -35,7 +36,12 @@ func _process(delta: float) -> void:
 		global_position = Vector2.ZERO
 	elif is_heir:
 		_follow_as_heir(delta)
+	_update_motion_anim()
 	_apply_needs_damage(delta)
+
+
+func _update_motion_anim() -> void:
+	set_motion_state(_last_move_dir.length_squared() > 0.01, _last_move_dir)
 
 
 func _follow_as_heir(_delta: float) -> void:
@@ -44,6 +50,7 @@ func _follow_as_heir(_delta: float) -> void:
 
 func _handle_movement(delta: float) -> void:
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	_last_move_dir = direction
 	if direction == Vector2.ZERO:
 		return
 	var world_content := get_tree().get_first_node_in_group("world_content") as Node2D
@@ -87,6 +94,8 @@ func _try_attack(target: Node) -> bool:
 		return false
 	target.receive_bite(self)
 	_attack_cooldown = GameConstants.ATTACK_COOLDOWN
+	if is_player_controlled:
+		EventBus.pack_assist_requested.emit(self, target)
 	return true
 
 

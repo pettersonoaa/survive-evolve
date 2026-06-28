@@ -20,6 +20,7 @@ func _ready() -> void:
 	needs.refill()
 	_add_tag_label()
 	_wander_timer = randf_range(2.0, 4.0)
+	EventBus.pack_assist_requested.connect(_on_pack_assist_requested)
 
 
 func _add_tag_label() -> void:
@@ -44,12 +45,14 @@ func _process(delta: float) -> void:
 	var player := GameState.player_wolf
 	if player != null and is_instance_valid(player) and not player.is_dead:
 		if global_position.distance_to(player.global_position) < GameConstants.PARTNER_IDLE_RANGE:
+			_last_move_dir = Vector2.ZERO
 			return
 	_wander_timer -= delta
 	if _wander_timer <= 0.0:
 		_wander_timer = randf_range(2.0, 4.0)
 		_wander_dir = Vector2.RIGHT.rotated(randf() * TAU)
 	global_position += _wander_dir * wander_speed * delta
+	_last_move_dir = _wander_dir
 
 
 func _is_gestation_partner() -> bool:
@@ -65,8 +68,18 @@ func _follow_player_during_gestation(delta: float) -> void:
 	var offset := player.global_position - global_position
 	var dist := offset.length()
 	if dist <= GameConstants.PARTNER_GESTATION_STOP_RANGE:
+		_last_move_dir = Vector2.ZERO
 		return
+	_last_move_dir = offset.normalized()
 	global_position += offset.normalized() * GameConstants.PARTNER_GESTATION_FOLLOW_SPEED * delta
+
+
+func _on_pack_assist_requested(attacker: Node, target: Node) -> void:
+	if is_dead or not _is_gestation_partner() or attacker != GameState.player_wolf:
+		return
+	if not target.has_method("receive_bite"):
+		return
+	_try_attack(target)
 
 
 func _die(cause: String) -> void:

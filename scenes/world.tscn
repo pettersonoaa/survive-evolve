@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://world25d"]
+[gd_scene load_steps=27 format=3 uid="uid://world25d"]
 
 [ext_resource type="Script" path="res://scripts/world_25d.gd" id="1_world"]
 [ext_resource type="Script" path="res://scripts/ground_grid.gd" id="2_ground"]
@@ -21,12 +21,17 @@
 [ext_resource type="PackedScene" uid="uid://debug_overlay" path="res://scenes/debug/debug_overlay.tscn" id="15_debug"]
 [ext_resource type="Script" path="res://scripts/systems/lineage_manager.gd" id="16_lineage"]
 [ext_resource type="Script" path="res://scripts/systems/run_manager.gd" id="17_run"]
+[ext_resource type="Script" path="res://scripts/systems/resource_respawn_manager.gd" id="25_respawn"]
+[ext_resource type="Script" path="res://scripts/systems/day_night_cycle.gd" id="26_daynight"]
 [ext_resource type="PackedScene" uid="uid://toast_layer" path="res://scenes/ui/toast_layer.tscn" id="18_toast"]
 [ext_resource type="PackedScene" uid="uid://interact_hint" path="res://scenes/ui/interact_hint.tscn" id="19_interact"]
 [ext_resource type="PackedScene" uid="uid://onboarding_hint" path="res://scenes/ui/onboarding_hint.tscn" id="20_onboard"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_world")
+
+[node name="DayNightModulate" type="CanvasModulate" parent="."]
+script = ExtResource("26_daynight")
 
 [node name="WorldContent" type="Node2D" parent="."]
 script = ExtResource("21_world_content")
@@ -183,6 +188,9 @@ script = ExtResource("16_lineage")
 
 [node name="RunManager" type="Node" parent="."]
 script = ExtResource("17_run")
+
+[node name="ResourceRespawnManager" type="Node" parent="."]
+script = ExtResource("25_respawn")
 
 [node name="UI" type="CanvasLayer" parent="."]
 

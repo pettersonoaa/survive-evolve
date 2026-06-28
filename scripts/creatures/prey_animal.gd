@@ -18,6 +18,7 @@ var _wander_timer := 0.0
 func _ready() -> void:
 	body_color = Color(0.72, 0.58, 0.38)
 	body_size = Vector2(18.0, 24.0)
+	use_walk_animations = false
 	health = max_health
 	add_to_group("prey_animal")
 	super._ready()
@@ -25,9 +26,14 @@ func _ready() -> void:
 
 
 func _apply_body_sprite() -> void:
-	_body.texture = _PreySprites.create(body_color, body_size)
+	var tex := _PreySprites.create(body_color, body_size)
+	var frames := SpriteFrames.new()
+	frames.add_animation(&"idle")
+	frames.add_frame(&"idle", tex)
+	_body.sprite_frames = frames
 	_body.centered = false
 	_body.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_body.play(&"idle")
 
 
 func _process(delta: float) -> void:

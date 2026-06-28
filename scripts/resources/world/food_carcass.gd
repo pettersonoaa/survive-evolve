@@ -19,4 +19,5 @@ func handle_interact(player) -> bool:
 	EventBus.consume_food.emit(player, food_amount)
 	depleted = true
 	modulate = Color(0.5, 0.5, 0.5, 0.35)
+	EventBus.resource_depleted.emit(self)
 	return true
