@@ -23,7 +23,15 @@ func _setup_new_run() -> void:
 
 func _load_saved_run() -> void:
 	LineageSave.load_into_world(self)
+	call_deferred("_ensure_predators_on_continue")
 	call_deferred("_apply_world_scaling")
+
+
+func _ensure_predators_on_continue() -> void:
+	var seed_val := GameState.run_seed
+	if seed_val == 0:
+		seed_val = hash("continue_predators_%d" % GameState.lineage.generation)
+	_WorldGenerator.ensure_predators(self, seed_val)
 
 
 func _apply_world_scaling() -> void:

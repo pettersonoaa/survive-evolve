@@ -8,12 +8,12 @@ var _follow_distance := 80.0
 func _ready() -> void:
 	is_player_controlled = false
 	is_heir = true
-	body_color = Color(0.62, 0.62, 0.65)
 	super._ready()
 	needs.set_process(true)
 	needs.refill()
 	GameState.register_heir(self)
 	_follow_target = GameState.player_wolf
+	add_to_group("pack_member")
 	EventBus.pack_assist_requested.connect(_on_pack_assist_requested)
 
 
@@ -24,6 +24,7 @@ func setup_from_birth(birth_stats: WolfStats, node_id: String, partner_genes: Wo
 	partner_genes_at_birth = partner_genes
 	health = stats.max_health
 	body_size = Vector2(20.0, 32.0)
+	body_color = EvolutionRegistry.get_offspring_color(partner_genes.archetype_id, node_id)
 	if is_node_ready():
 		_apply_body_sprite()
 		_update_geometry()

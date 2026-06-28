@@ -24,7 +24,7 @@ func _run_tests() -> void:
 	_test_heir_promotion_and_son_mate()
 	_test_predator_bite()
 	_test_prey_hunt()
-	_test_den_spawn()
+	_test_birth_spawn()
 	_test_lineage_save()
 
 
@@ -170,28 +170,33 @@ func _test_prey_hunt() -> void:
 		_fail("prey death did not spawn a carcass")
 
 
-func _test_den_spawn() -> void:
-	var den: Node2D = InteractUtils.find_den(get_tree())
-	if den == null:
-		_fail("wolf den missing from world")
-		return
+func _test_birth_spawn() -> void:
 	var lineage_manager := get_tree().get_first_node_in_group("lineage_manager")
 	if lineage_manager == null:
-		_fail("lineage_manager missing for den test")
+		_fail("lineage_manager missing for birth test")
 		return
 	if not GameState.gestation_active:
-		_fail("gestation not active for den spawn test")
+		_fail("gestation not active for birth spawn test")
+		return
+	var partner: PartnerWolf = GameState.gestation_partner
+	if partner == null:
+		_fail("gestation partner missing for birth test")
 		return
 	while GameState.gestation_active and GameState.gestation_time_left > 0.0:
 		lineage_manager._process(1.0)
 		await get_tree().process_frame
 	var heirs := GameState.get_living_heirs()
 	if heirs.is_empty():
-		_fail("no heir spawned at den")
+		_fail("no heir spawned beside partner")
 		return
 	var heir := heirs[heirs.size() - 1]
-	if not den.has_method("contains_wolf") or not den.contains_wolf(heir):
-		_fail("heir not spawned inside den safe zone")
+	if not is_instance_valid(partner):
+		_fail("gestation partner missing after birth")
+		return
+	for pup in heirs:
+		if pup.global_position.distance_to(partner.global_position) > 90.0:
+			_fail("pup not spawned beside gestation partner")
+			return
 
 
 func _test_lineage_save() -> void:
@@ -204,7 +209,7 @@ func _test_lineage_save() -> void:
 		_fail("lineage save test: file not written")
 		return
 	var data := LineageSave._read_save()
-	if int(data.get("version", 0)) != 1:
+	if int(data.get("version", 0)) != 2:
 		_fail("lineage save test: bad version")
 		return
 	var player_data: Dictionary = data.get("player", {})

@@ -23,9 +23,14 @@ func _process(delta: float) -> void:
 		_trait_label.text = "Trait: %s" % wolf.trait_display_name
 		GameState.prune_dead_heirs()
 		_heir_label.text = "Heirs: %d" % GameState.living_heirs.size()
-		_threat_label.text = "Threat: %s" % _threat_tier(GameState.lineage.generation)
+		_threat_label.text = "Threat: %s (pack %d)" % [_threat_tier(), GameState.get_pack_size()]
 	if GameState.gestation_active:
-		_gestation_label.text = "Gestation: %ds (slow drain)" % int(ceil(GameState.gestation_time_left))
+		var parts: PackedStringArray = []
+		for entry in GameState.active_gestations:
+			var partner: PartnerWolf = entry.get("partner") as PartnerWolf
+			var tag := partner.genes.display_tag if partner != null else "?"
+			parts.append("%s %ds" % [tag, int(ceil(entry.time_left))])
+		_gestation_label.text = "Gestation: %s" % ", ".join(parts)
 		_gestation_label.visible = true
 	else:
 		_gestation_label.visible = false
@@ -41,19 +46,30 @@ func _on_mate_completed(_parent: Node, _partner: Node, son: Node) -> void:
 
 
 func _on_needs_critical(wolf: Node, need: String) -> void:
-	if wolf != GameState.player_wolf:
+	if wolf == GameState.player_wolf:
+		if need == "hunger":
+			EventBus.ui_toast.emit("Low hunger — find food!", 2.0)
+		else:
+			EventBus.ui_toast.emit("Low thirst — find water!", 2.0)
 		return
-	if need == "hunger":
-		EventBus.ui_toast.emit("Low hunger — find food!", 2.0)
-	else:
-		EventBus.ui_toast.emit("Low thirst — find water!", 2.0)
+	if wolf is Wolf and not wolf.is_dead:
+		var label := "Pack member"
+		if wolf is PartnerWolf:
+			label = (wolf as PartnerWolf).genes.display_tag
+		elif wolf is SonWolf:
+			label = "Pup %s" % wolf.trait_display_name
+		if need == "hunger":
+			EventBus.ui_toast.emit("%s is starving!" % label, 2.0)
+		else:
+			EventBus.ui_toast.emit("%s is thirsty!" % label, 2.0)
 
 
-func _threat_tier(generation: int) -> String:
-	if generation < 2:
+func _threat_tier() -> String:
+	var pressure := GameState.lineage.generation + maxi(GameState.get_pack_size() - 2, 0)
+	if pressure < 2:
 		return "Calm"
-	if generation < 5:
+	if pressure < 5:
 		return "Tense"
-	if generation < 8:
+	if pressure < 8:
 		return "Harsh"
 	return "Deadly"

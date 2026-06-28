@@ -16,8 +16,6 @@ func _on_wolf_died(wolf, cause: String) -> void:
 	if wolf != GameState.player_wolf:
 		if wolf.is_heir:
 			GameState.unregister_heir(wolf)
-		elif wolf is PartnerWolf and GameState.gestation_partner == wolf:
-			GameState.gestation_partner = null
 		return
 
 	var heirs := GameState.get_living_heirs()
@@ -70,8 +68,7 @@ func _end_run_win(apex_name: String) -> void:
 func promote_heir(heir: SonWolf, from_wolf) -> void:
 	get_tree().paused = false
 	GameState.modal_ui_open = false
-	if GameState.gestation_active and not GameState.pending_offspring.is_empty():
-		GameState.pending_offspring["parent"] = heir
+	GameState.retarget_gestation_parent(from_wolf, heir)
 	heir.promote_to_player()
 	if is_instance_valid(from_wolf):
 		from_wolf.queue_free()

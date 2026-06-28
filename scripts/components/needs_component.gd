@@ -28,9 +28,13 @@ func _process(delta: float) -> void:
 	if wolf != null:
 		if wolf.get("is_player_controlled"):
 			decay_scale *= GameConstants.PLAYER_NEEDS_DECAY_MULT
+			var pack_size := GameState.get_pack_size()
+			decay_scale *= 1.0 + float(maxi(pack_size - 1, 0)) * GameConstants.PACK_SIZE_DECAY_SCALE
 			decay_scale *= 1.0 + float(GameState.lineage.generation) * GameConstants.GENERATION_NEEDS_SCALE
 			if GameState.gestation_active:
 				decay_scale *= 0.35
+		elif wolf is PartnerWolf:
+			decay_scale *= GameConstants.PARTNER_NEEDS_DECAY_MULT
 		elif wolf.get_script() != null:
 			var script_path: String = wolf.get_script().resource_path
 			if script_path.ends_with("son_wolf.gd") and wolf.is_heir:

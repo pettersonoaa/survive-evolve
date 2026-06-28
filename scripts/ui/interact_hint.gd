@@ -72,7 +72,7 @@ func _process(_delta: float) -> void:
 
 
 func _partner_hint(partner: PartnerWolf, player) -> String:
-	if GameState.gestation_active:
+	if GameState.is_partner_gestating(partner):
 		return "[E] Mate (gestating...)"
 	if GameConstants.MATE_REQUIRES_FED and not player.needs.is_fed_for_mate():
 		return "[E] Mate (need >50% hunger & thirst)"

@@ -159,7 +159,7 @@ func _pick_interact_target() -> Node:
 		if not node is PartnerWolf:
 			continue
 		var partner := node as PartnerWolf
-		if partner.is_dead or GameState.gestation_active:
+		if partner.is_dead or GameState.is_partner_gestating(partner):
 			continue
 		var dist := InteractUtils.distance_to(self, partner)
 		if dist <= GameConstants.MATE_RANGE and dist < best_partner_dist:
@@ -203,8 +203,8 @@ func _pick_interact_target() -> Node:
 func _fail_message_for(node: Node) -> void:
 	if node is PartnerWolf:
 		var partner := node as PartnerWolf
-		if GameState.gestation_active:
-			EventBus.ui_toast.emit("Already gestating — wait for birth", 2.0)
+		if GameState.is_partner_gestating(partner):
+			EventBus.ui_toast.emit("%s is already gestating" % partner.genes.display_tag, 2.0)
 		elif not InteractUtils.is_in_mate_range(self, partner):
 			EventBus.ui_toast.emit("Move closer to mate", 1.5)
 		elif GameConstants.MATE_REQUIRES_FED and not needs.is_fed_for_mate():

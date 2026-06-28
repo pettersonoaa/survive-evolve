@@ -64,3 +64,9 @@ func make_partner_genes(archetype_id: String) -> WolfGenes:
 func get_partner_color(archetype_id: String) -> Color:
 	var preset: Dictionary = PARTNER_PRESETS.get(archetype_id, PARTNER_PRESETS["forest_wolf"])
 	return preset["color"]
+
+
+func get_offspring_color(archetype_id: String, node_id: String) -> Color:
+	var base := get_partner_color(archetype_id)
+	var hue_shift := float(abs(node_id.hash()) % 100) / 1000.0
+	return base.lerp(base.lightened(0.08 + hue_shift), 0.35)

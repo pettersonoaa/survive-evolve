@@ -13,7 +13,7 @@
 | STEP-11–12 | yes | 2026-06-27 | 34-node tree + mate-time evolution |
 | STEP-13–14 | yes | 2026-06-27 | LineageHUD + game over / victory |
 | STEP-15 | yes | 2026-06-27 | Debug overlay K/M/R |
-| Combat | yes | 2026-06-27 | PredatorWolf ×2 |
+| Combat | yes | 2026-06-27 | PredatorWolf ×6 base (scales to 10 with generation) |
 | Polish pass | yes | 2026-06-27 | UX: interact hints, toasts, health bar, pause on modals, gestation fix |
 | Bugfix pass | yes | 2026-06-27 | player_wolf reset race, mate range, HUD bars, heir needs, predator targets heirs |
 | STEP-20 | yes | 2026-06-27 | Procedural wolf Sprite2D via WolfSpriteFactory |

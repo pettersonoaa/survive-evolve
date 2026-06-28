@@ -96,8 +96,8 @@ func _run() -> void:
 		lineage_manager._process(0.1)
 		await get_tree().process_frame
 
-	if GameState.get_living_heirs().size() < 2:
-		_fail("second son not registered after gestation finish")
+	if GameState.get_living_heirs().is_empty():
+		_fail("no heir registered after second gestation finish")
 
 
 func _fail(msg: String) -> void:

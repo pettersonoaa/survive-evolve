@@ -1,6 +1,6 @@
 # Design decisions — LOCKED
 
-**Status:** Decisions locked (2026-06-27)  
+**Status:** Decisions locked — revised **2026-06-28** to match shipped prototype  
 **Owner:** Renata  
 **Purpose:** Agents implement from this file — do not guess.
 
@@ -12,16 +12,19 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 
 | Pillar | Choice |
 |--------|--------|
-| **Lineage** | Multiple sons; on death pick which to play |
-| **Heir loss** | Son dies → parent continues, can remate |
+| **Lineage** | Multiple pups per life; on death pick which heir to play |
+| **Litters** | Each gestation yields **1–3 pups** (siblings share rolled trait) |
+| **Heir loss** | Pup dies → parent continues, can remate |
 | **Chain** | Each generation must mate before dying or game over |
-| **Evolution** | At **mate time** (gestation ~60s), per-wolf tree position |
+| **Evolution** | At **mate time** (gestation **30s**), per-wolf tree position |
 | **Victory** | Reach max evolution node → lineage “complete” (game over win) |
-| **Survival** | Press **E** to eat/drink; finite resources, no respawn |
-| **Combat** | Starvation, dehydration, **and** predators/combat in v1 |
-| **World** | Wandering partners, larger map, **30+ node** evolution DAG |
+| **Survival** | Press **E** to eat/drink; resources deplete then **respawn ~90s** |
+| **Pack** | Partners + pups share hunger/thirst; player feeding feeds the pack |
+| **Combat** | Starvation, dehydration, **predators** (scale with generation + pack size) |
+| **World** | Large map (48-tile radius), **procedural scatter** on New Lineage, biomes + hunt |
+| **Meta** | **Lineage Codex** persists discovered traits across runs; gameplay resets on New Lineage |
 
-**Note for agents:** This diverges from `PROTOTYPE_PLAN.md` defaults (1 son, evolution on death, auto-consume). **This file wins** when they conflict. Update `PROTOTYPE_PLAN.md` / `GAME_CONCEPT.md` during implementation.
+**Note for agents:** This file wins over older `PROTOTYPE_PLAN.md` defaults. The plan doc tracks implementation steps; this doc tracks **design truth**.
 
 ---
 
@@ -29,11 +32,11 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 
 | # | Question | Your answer |
 |---|----------|-------------|
-| **A1** | One son or many? | **Multiple** — pick heir on death |
-| **A2** | When does evolution happen? | **At mate** — son born with trait after gestation |
-| **A3** | Son dies before you — then what? | **Remate** — parent continues |
-| **A4** | Eat/drink how? | **Press E** at resource |
-| **A5** | Mate how? | **Press E** when near fed partner |
+| **A1** | One pup or many? | **Multiple** — litters of 1–3; pick heir on death |
+| **A2** | When does evolution happen? | **At mate** — pups born with trait after gestation |
+| **A3** | Pup dies before you — then what? | **Remate** — parent continues |
+| **A4** | Eat/drink how? | **Press E** at resource — **pack eats together** |
+| **A5** | Mate how? | **Press E** near partner; **multiple partners** can gestate at once |
 
 ---
 
@@ -45,15 +48,15 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 
 | Option | Behavior |
 |--------|----------|
-| **A** | One son per player life. |
+| **A** | One pup per player life. |
 | **B** | One living heir at a time. |
-| **C** | **Multiple sons.** On death, pick which son to play. |
+| **C** | **Multiple pups.** On death, pick which pup to play. |
 
-**YOUR ANSWER:** **C** — Multiple sons per life. On player death, show heir picker UI (list living sons). Remating can add more sons over time. Sons that already exist stay in the world as NPCs until selected or they die.
+**YOUR ANSWER:** **C** — Multiple pups per life. Each successful gestation spawns a **litter of 1–3 pups** (DEC-22). Siblings from the same litter share the rolled evolution trait/stats. On player death, show heir picker UI (list living pups). Remating can add more litters over time. Pups stay in the world as NPC heirs until selected or they die.
 
 ---
 
-### DEC-02 — What happens if your son dies while you still play the parent?
+### DEC-02 — What happens if your pup dies while you still play the parent?
 
 **Blocks:** STEP-10, STEP-14
 
@@ -61,23 +64,23 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 |--------|----------|
 | **A** | Game over immediately. |
 | **B** | **Parent continues;** can mate again. |
-| **C** | Son respawns at den. |
+| **C** | Pup respawns at den. |
 
-**YOUR ANSWER:** **B** — Parent continues playing. Dead son is removed from heir list. Player may mate again (after gestation rules) to produce a new heir. Game over only if player dies with **no living sons** (see DEC-01 picker).
+**YOUR ANSWER:** **B** — Parent continues playing. Dead pup is removed from heir list. Player may mate again (after gestation rules) to produce a new litter. Game over only if player dies with **no living heirs** (see DEC-01 picker).
 
 ---
 
-### DEC-03 — What happens when you die as the son (second generation)?
+### DEC-03 — What happens when you die as the pup (second generation)?
 
 **Blocks:** STEP-10, STEP-12, STEP-14
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Need a grandson** — must mate before death. |
-| **B** | Son can die without heir. |
+| **A** | **Need a grand-pup** — must mate before death. |
+| **B** | Pup can die without heir. |
 | **C** | Infinite chain with auto-heir. |
 
-**YOUR ANSWER:** **A** — Every controlled wolf (any generation) must have at least one living offspring before death, or **game over (`no_heir`)**. Playing as son: mate during gestation window → grandson exists → on son death, pick grandson (or game over if none). Same rule applies for grandson, great-grandson, etc.
+**YOUR ANSWER:** **A** — Every controlled wolf (any generation) must have at least one living heir before death, or **game over (`no_heir`)**. Same rule for pup → grand-pup → etc. If player dies during gestation with no heirs, gestation can still finish and auto-promote the first pup of the litter (succession deferral).
 
 ---
 
@@ -89,9 +92,9 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 |--------|----------|
 | **A** | Automatic on death. |
 | **B** | Player picks from rolled options. |
-| **C** | **At mate time** — son gets trait; death only transfers control. |
+| **C** | **At mate time** — pups get trait; death only transfers control. |
 
-**YOUR ANSWER:** **C** — On successful mate (E press + requirements met), roll evolution **immediately** and store trait on pending offspring. After **gestation (~60s)** (DEC-09), son spawns with rolled stats/trait applied. Death does **not** roll evolution; it only triggers succession / heir picker.
+**YOUR ANSWER:** **C** — On successful mate (E + requirements), roll evolution **once per gestation** and store on pending offspring. After gestation (DEC-09), **all pups in the litter** spawn with that rolled trait/stats. Death does **not** roll evolution; it triggers succession / heir picker.
 
 ---
 
@@ -105,7 +108,7 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 | **B** | **Per individual** — each wolf has own branch state. |
 | **C** | Hybrid. |
 
-**YOUR ANSWER:** **B** — Each wolf stores `current_node_id` on their `WolfGenes` / individual record. Mate roll uses **parent’s** node + **partner’s** `branch_weights`. Son starts at rolled child node; siblings can diverge if parents remate with different partners.
+**YOUR ANSWER:** **B** — Each wolf stores `current_node_id`. Mate roll uses **parent’s** node + **partner’s** `branch_weights`. Pups start at rolled child node; siblings from different litters/partners can diverge.
 
 ---
 
@@ -133,33 +136,38 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 | **B** | **Wandering partner** — chase before mate. |
 | **C** | Partner at den. |
 
-**YOUR ANSWER:** **B** — Partner wolf wanders the map (random direction every 2–4s). Player must find and catch them. Prototype: spawn **2–3** wandering partners (one per archetype: forest, plains, tundra) or random archetype per spawn.
+**YOUR ANSWER:** **B** — Partner wolves wander (random direction every 2–4s). Player must find them. Prototype spawns **four** partners (forest, plains, tundra, desert) placed in/near biome zones. On **New Lineage**, `WorldGenerator` scatters partners, prey, resources, and predators.
 
 ---
 
 ### DEC-08 — Mate requirements
 
-| Requirement | Plan default | Your value |
-|-------------|--------------|------------|
-| Player hunger min | > 50% | **> 50%** |
-| Player thirst min | > 50% | **> 50%** |
-| Partner hunger min | > 50% | **> 50%** |
-| Proximity | 48 px | **48 px** |
+| Requirement | Design default | Shipped prototype |
+|-------------|----------------|-------------------|
+| Player hunger min | > 50% | **Disabled** (`MATE_REQUIRES_FED = false`) |
+| Player thirst min | > 50% | **Disabled** |
+| Partner hunger min | > 50% | **Disabled** |
+| Proximity | 48 px | **100 px** (`MATE_RANGE`) |
 | Input | Press **E** | **E** |
 
-**YOUR ANSWER:** **Defaults** — all thresholds as above. **E** is shared with resource interact (DEC-12); context resolves target (nearest valid interactable).
+**YOUR ANSWER:** Design defaults above. Prototype toggles fed gate off for faster playtests; re-enable via `GameConstants.MATE_REQUIRES_FED`. **E** is shared with resource interact (DEC-12); context resolves nearest valid target.
 
 ---
 
-### DEC-09 — Mate timing
+### DEC-09 — Mate timing & birth
 
 | Option | Behavior |
 |--------|----------|
-| **A** | Instant son. |
-| **B** | **Gestation ~60s** — son spawns later. |
+| **A** | Instant pups. |
+| **B** | **Gestation ~30s** — litter spawns later. |
 | **C** | Return to den to birth. |
 
-**YOUR ANSWER:** **B** — After mate, **60 second gestation**. During gestation: parent can still move/fight/survive; optional UI timer. Son spawns at parent position when timer ends, with evolution from DEC-04 already applied. Only one active gestation per parent at a time.
+**YOUR ANSWER:** **B** — After mate, **30 second gestation** (`GESTATION_SECONDS`). During gestation: parent moves/fights; partner follows player; slow needs drain on parent. When timer ends:
+
+- **1–3 pups** spawn in a small cluster **beside the female partner** (not at den).
+- Partner then **stays near her pups** (guard behavior).
+- **Multiple gestations** allowed at once — **one per partner** (mate forest + tundra partners in parallel).
+- `lineage.generation` increments **once per litter**, not per pup.
 
 ---
 
@@ -171,15 +179,16 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 | **B** | **Multiple partner types** — different `branch_weights`. |
 | **C** | Random partner genes each run. |
 
-**YOUR ANSWER:** **B** — Three wandering partner archetypes with distinct `WolfGenes.branch_weights`:
+**YOUR ANSWER:** **B** — Four wandering partner archetypes:
 
 | archetype | UI tag | Bias | Placeholder color |
 |-----------|--------|------|-------------------|
-| `forest_wolf` | *Forest blood* | Senses, metabolism, scavenger | Cinza / preto — `Color(0.42, 0.42, 0.45)` |
-| `plains_wolf` | *Plains blood* | Mobility, pack, sprint | Marrom / bege — `Color(0.58, 0.44, 0.32)` |
-| `tundra_wolf` | *Tundra blood* | Physique, winter survival | Branco — `Color(0.93, 0.94, 0.96)` |
+| `forest_wolf` | *Forest blood* | Senses, metabolism, scavenger | `Color(0.42, 0.42, 0.45)` |
+| `plains_wolf` | *Plains blood* | Mobility, pack, sprint | `Color(0.58, 0.44, 0.32)` |
+| `tundra_wolf` | *Tundra blood* | Physique, winter survival | `Color(0.93, 0.94, 0.96)` |
+| `desert_wolf` | *Desert blood* | Ambush, heat survival | `Color(0.72, 0.58, 0.38)` |
 
-Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. Full weights in `docs/EVOLUTION_TREE_WOLF.md`.
+Visible tags on partners and in birth toasts (DEC-18). Full weights in `docs/EVOLUTION_TREE_WOLF.md`.
 
 ---
 
@@ -188,9 +197,21 @@ Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. F
 | Option | Behavior |
 |--------|----------|
 | **A** | No — only `branch_weights`. |
-| **B** | **Yes** — multiply son base stats at birth. |
+| **B** | **Yes** — multiply pup base stats at birth. |
 
-**YOUR ANSWER:** **B** — `stat_bias` applies to son’s base `WolfStats` at birth (after evolution roll). Example: `{"move_speed": 1.1}` → son 10% faster before trait deltas.
+**YOUR ANSWER:** **B** — `stat_bias` applies to pups’ base `WolfStats` at birth (after evolution roll).
+
+---
+
+### DEC-22 — Litter size
+
+| Option | Behavior |
+|--------|----------|
+| **A** | Always 1 pup. |
+| **B** | **1–3 pups** per gestation. |
+| **C** | Fixed 3. |
+
+**YOUR ANSWER:** **B** — Roll `litter_size` ∈ [1, 3] at mate time. All siblings in a litter share the same rolled trait/stats. Pup **sprite color** reflects partner bloodline (`get_offspring_color`). Slightly offset spawn positions around the mother.
 
 ---
 
@@ -204,7 +225,7 @@ Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. F
 | **B** | **Press E** at resource. |
 | **C** | Auto eat / manual drink. |
 
-**YOUR ANSWER:** **B** — Stand within interact range of `FoodCarcass` / `WaterSource`, press **E**. Same key as mate; nearest eligible target wins. Show interact hint when in range.
+**YOUR ANSWER:** **B** — Stand within interact range, press **E**. When the **player** eats or drinks, **all living pack members** (partners + pups) receive the same hunger/thirst refill (`PackNeedsManager`). Pack HUD shows partner/pup needs bars.
 
 ---
 
@@ -214,9 +235,9 @@ Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. F
 |--------|----------|
 | **A** | Infinite. |
 | **B** | Finite with respawn. |
-| **C** | **Finite, no respawn** — find next node. |
+| **C** | Finite, no respawn. |
 
-**YOUR ANSWER:** **C** — Each resource node **one use** then depleted (hidden or greyed out). No respawn in prototype. Map must have enough scattered nodes for a full gestation + mate loop (favors **larger map**, DEC-21).
+**YOUR ANSWER:** **B (revised)** — Each node **one use** then depleted (greyed out). **`ResourceRespawnManager`** respawns after **90s**. Larger map (DEC-21) + hunt loop (deer → carcass) support pack feeding pressure.
 
 ---
 
@@ -224,21 +245,21 @@ Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. F
 
 **YOUR ANSWER:**
 
-- [x] Starvation (hunger → 0)
+- [x] Starvation (hunger → 0) — **player, partners, and pups**
 - [x] Dehydration (thirst → 0)
-- [x] **Combat / predators** — include basic predator or hostile NPC damage in v1 (STEP-21+ or parallel combat step)
+- [x] **Combat / predators** — base count 6, scales with generation + pack size
 - [x] Debug key **K** for testing (STEP-15)
 
 ---
 
 ### DEC-15 — Target time until critical needs (tuning)
 
-| | Plan default | Your target |
-|---|--------------|-------------|
-| Hunger | ~67 seconds | **~67 seconds** |
-| Thirst | ~50 seconds | **~50 seconds** |
+| | Plan default | Shipped |
+|---|--------------|---------|
+| Hunger | ~67 seconds | ~67s base; **faster with larger pack** (`PACK_SIZE_DECAY_SCALE`) |
+| Thirst | ~50 seconds | ~50s base; scales with pack |
 
-**YOUR ANSWER:** **Defaults** — tune in STEP-03; finite resources (DEC-13) make these timings matter more.
+**YOUR ANSWER:** Base decay as above. Player needs decay increases with **pack size** and **generation**. Partners/pups decay independently; pack must be fed via shared consumption (DEC-12).
 
 ---
 
@@ -246,31 +267,19 @@ Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. F
 
 ### DEC-16 — Approve example tree or replace?
 
-**YOUR ANSWER:** **Custom — minimum 30 nodes.** Do **not** use the 7-node example as-is. Expand `wolf_tree` into a **branching DAG** with ≥30 `EvolutionNode`s, multiple mid-tier branches, 2–3 merge nodes, and 1–2 final “apex” nodes (e.g. `ancient_wolf` line). Keep §5 of `PROTOTYPE_PLAN.md` as **structural inspiration** only. Author in `data/evolution/wolf_tree.tres` before STEP-12.
+**YOUR ANSWER:** **Custom — 34 nodes** in branching DAG (`wolf_tree`). Multiple mid-tier branches, apex node for victory (DEC-06).
 
 ---
 
 ### DEC-17 — Tree shape
 
-| Option | Behavior |
-|--------|----------|
-| **A** | **Branching DAG** — choices matter. |
-| **B** | Single linear path. |
-| **C** | Wide shallow tree. |
-
-**YOUR ANSWER:** **A** — Branching DAG required for 30+ nodes. Partner `branch_weights` bias which child nodes are likely at mate roll (DEC-04).
+**YOUR ANSWER:** **Branching DAG** — partner `branch_weights` bias mate roll (DEC-04).
 
 ---
 
 ### DEC-18 — Should partner influence be visible to the player?
 
-| Option | Behavior |
-|--------|----------|
-| **A** | Hidden. |
-| **B** | **Show partner tags** in UI. |
-| **C** | Show on death only. |
-
-**YOUR ANSWER:** **B** — Label wandering partners (e.g. “Forest blood”, “Plains blood”, “Tundra blood”). On son birth after gestation, briefly show rolled trait name + partner influence.
+**YOUR ANSWER:** **B** — Partner blood tags on map. On litter birth, toast shows trait + partner tag. Pup color matches bloodline. **Lineage Codex** (main menu) lists traits discovered across runs.
 
 ---
 
@@ -278,28 +287,26 @@ Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. F
 
 ### DEC-19 — Game over vs “lineage complete”
 
-| Option | Behavior |
-|--------|----------|
-| **A** | Same screen. |
-| **B** | Different screens per reason. |
-| **C** | **Stats summary** — generations, traits. |
+**YOUR ANSWER:** **C** — Three outcomes:
 
-**YOUR ANSWER:** **C** — **Three outcomes, distinct copy:**
-
-1. **`no_heir`** — failure; stats summary (gens reached, traits seen).
-2. **`lineage_complete`** — victory at max node (DEC-06); stats + “Ancient lineage”.
-3. **Restart** from either screen (DEC-20).
+1. **`no_heir`** — failure; stats summary.
+2. **`lineage_complete`** — victory at apex (DEC-06).
+3. **Main menu** — Continue / New Lineage (DEC-20).
 
 ---
 
-### DEC-20 — Restart behavior
+### DEC-20 — Restart & persistence
 
 | Option | Behavior |
 |--------|----------|
-| **A** | **Full reset** — gen 0, fresh map resources. |
+| **A** | **Full reset** on New Lineage. |
 | **B** | Meta unlocks persist. |
 
-**YOUR ANSWER:** **A** — Full reset on restart. No meta persistence in prototype.
+**YOUR ANSWER:** **Hybrid (revised):**
+
+- **Continue** — JSON save: player, heirs, gestations (incl. litter size), world camera offset.
+- **New Lineage** — full gameplay reset; **procedural world scatter** (`run_seed`).
+- **Lineage Codex** (`user://lineage_codex.json`) — **persists** discovered traits across New Lineage (meta only, not stats).
 
 ---
 
@@ -311,7 +318,22 @@ Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. F
 | **B** | **Larger map** — expand `ground_grid`. |
 | **C** | Procedural map. |
 
-**YOUR ANSWER:** **B** — Expand `ground_grid` extent (suggest **40–48** tiles radius vs current 24). Scatter more finite resources and wandering partners. Procedural deferred.
+**YOUR ANSWER:** **B + partial C** — `ground_grid` extent **48** tiles. **New Lineage** scatters resources, partners, prey, predators, props via `WorldGenerator`. Continue restores saved layout. Biome zones: tundra, desert (+ forest/plains partners).
+
+---
+
+### DEC-23 — Pack management
+
+| Topic | Behavior |
+|-------|----------|
+| Pack members | Player + wandering partners + living pups |
+| Needs UI | Player `NeedsHUD` + `PackHUD` for partners/pups |
+| Feeding | Player E-interact feeds entire pack |
+| Difficulty | More pack members → higher needs pressure + more predators + threat tier |
+| Den | Safe zone for pups (reduced decay); **birth is at mother**, not den |
+| Pack assist | Gestation partner joins player bites; pups assist when heir |
+
+**YOUR ANSWER:** Implemented as above (STEP-31 pack assist, pack needs, Phase 3 scaling).
 
 ---
 
@@ -320,12 +342,10 @@ Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. F
 | Action | Default | Your key |
 |--------|---------|----------|
 | Move | WASD + arrows | **WASD + arrows** |
-| Interact (mate, eat, drink) | E | **E** |
+| Interact (mate, eat, drink, hunt, bite) | E | **E** |
 | Debug kill | K | **K** |
 | Debug mate | M | **M** |
 | Debug refill | R | **R** |
-
-**YOUR ANSWER:** **Defaults** — add `interact` action (E) in `project.godot` at STEP-06/08.
 
 ---
 
@@ -333,20 +353,20 @@ Visible tags in UI (DEC-18). Random which archetype each spawned partner uses. F
 
 | Decision | Unblocks |
 |----------|----------|
-| DEC-01, 02, 03, 04, 05 | STEP-08–10, 12–14 (succession + heir picker) |
-| DEC-06 | STEP-12, STEP-14 (victory path) |
-| DEC-07–11 | STEP-08, 11–12 (wandering partners, gestation, genetics) |
-| DEC-12–15 | STEP-03, 06 (needs, E-interact, finite resources) |
-| DEC-14 | Combat / predator step (new or STEP-21 early) |
-| DEC-16–18 | STEP-11–13 (30+ node tree, partner UI) |
-| DEC-19–21 | STEP-14, 16 (screens, map size) |
+| DEC-01–06 | Succession, heir picker, victory |
+| DEC-07–11, 22 | Partners, gestation, genetics, litters |
+| DEC-12–15, 23 | Needs, pack feeding, predators, respawn |
+| DEC-16–18 | 34-node tree, codex, pup colors |
+| DEC-19–21 | Menus, save, procedural scatter |
+| DEC-23 | Pack HUD, shared feeding, scaling |
 
-**Agents:** All sections answered. Start STEP-01; revise `PROTOTYPE_PLAN.md` where this doc overrides it.
+**Agents:** This document reflects **shipped prototype** as of Phase 3 + pack pass. When adding features, update this file first.
 
 ---
 
-## After you answer
+## Implementation changelog (doc sync)
 
-1. ~~Fill answers in this file.~~ **Done.**
-2. Message: *“Decisions locked — see DESIGN_DECISIONS.md”*
-3. Agents copy final rules into `docs/GAME_CONCEPT.md` during STEP-16.
+| Date | Change |
+|------|--------|
+| 2026-06-27 | Initial lock (DEC-01–21) |
+| 2026-06-28 | Gestation 30s; litters 1–3; multi-gestation; birth at mother; pack feeding; respawn 90s; codex meta; procedural scatter; predator/pack scaling; desert partner; hunt loop; save/load |

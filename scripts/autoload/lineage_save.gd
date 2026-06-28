@@ -1,7 +1,7 @@
 extends Node
 
 const SAVE_PATH := "user://lineage_save.json"
-const SAVE_VERSION := 1
+const SAVE_VERSION := 2
 const AUTOSAVE_INTERVAL := 45.0
 
 var _skip_load_once := false
@@ -98,6 +98,7 @@ func save_run() -> void:
 		"player": _serialize_wolf(wolf),
 		"heirs": heirs_data,
 		"world_content": {"x": world_content_pos.x, "y": world_content_pos.y},
+		"gestations": _serialize_gestations(),
 		"gestation": _serialize_gestation(),
 	}
 	var json := JSON.stringify(data, "\t")
@@ -146,7 +147,9 @@ func load_into_world(world: Node2D) -> void:
 			float(heir_data.get("pos_y", 0.0))
 		)
 
-	_apply_gestation(data.get("gestation", {}))
+	_apply_gestations(data.get("gestations", []))
+	if data.get("gestations", []).is_empty():
+		_apply_gestation(data.get("gestation", {}))
 	EventBus.ui_toast.emit("Lineage restored from save", 2.5)
 
 
@@ -155,10 +158,15 @@ func _on_wolf_died(wolf, _cause: String) -> void:
 		save_run()
 
 
-func _serialize_gestation() -> Dictionary:
-	if not GameState.gestation_active:
-		return {"active": false}
-	var pending: Dictionary = GameState.pending_offspring
+func _serialize_gestations() -> Array:
+	var entries: Array = []
+	for entry in GameState.active_gestations:
+		entries.append(_serialize_gestation_entry(entry))
+	return entries
+
+
+func _serialize_gestation_entry(entry: Dictionary) -> Dictionary:
+	var pending: Dictionary = entry.get("pending", {})
 	var partner_archetype := ""
 	if pending.get("partner") is PartnerWolf:
 		var partner := pending["partner"] as PartnerWolf
@@ -168,48 +176,90 @@ func _serialize_gestation() -> Dictionary:
 	if pending.get("stats") is WolfStats:
 		stats_dict = _serialize_stats(pending["stats"] as WolfStats)
 	return {
-		"active": true,
-		"time_left": GameState.gestation_time_left,
+		"time_left": float(entry.get("time_left", 0.0)),
 		"pending": {
 			"node_id": str(pending.get("node_id", "wolf_base")),
 			"trait_name": str(pending.get("trait_name", "")),
 			"stats": stats_dict,
 			"partner_archetype": partner_archetype,
+			"litter_size": int(pending.get("litter_size", 1)),
 		},
 	}
 
 
-func _apply_gestation(data: Dictionary) -> void:
-	if not data.get("active", false):
-		return
-	var pending_data: Dictionary = data.get("pending", {})
-	var partner_archetype: String = pending_data.get("partner_archetype", "forest_wolf")
-	var partner: PartnerWolf = null
-	for node in get_tree().get_nodes_in_group("partner_wolf"):
-		if node is PartnerWolf and (node as PartnerWolf).genes.archetype_id == partner_archetype:
-			partner = node as PartnerWolf
-			break
-	if partner == null:
-		for node in get_tree().get_nodes_in_group("partner_wolf"):
-			if node is PartnerWolf:
-				partner = node as PartnerWolf
-				break
-	if partner == null:
-		return
+func _serialize_gestation() -> Dictionary:
+	if not GameState.gestation_active:
+		return {"active": false}
+	return {"active": true, "legacy": true, "entry": _serialize_gestation_entry(GameState.active_gestations[0])}
 
+
+func _apply_gestations(entries: Array) -> void:
+	GameState.active_gestations.clear()
+	for entry_data in entries:
+		if not entry_data is Dictionary:
+			continue
+		_apply_gestation_entry(entry_data)
+
+
+func _apply_gestation_entry(entry_data: Dictionary) -> void:
+	var pending_data: Dictionary = entry_data.get("pending", {})
+	var partner := _find_partner_by_archetype(pending_data.get("partner_archetype", "forest_wolf"))
+	if partner == null:
+		return
 	var stats := _stats_from_dict(pending_data.get("stats", {}))
 	var node_id: String = pending_data.get("node_id", "wolf_base")
-	GameState.pending_offspring = {
+	var pending := {
 		"stats": stats,
 		"node_id": node_id,
 		"trait_name": pending_data.get("trait_name", EvolutionResolver.get_display_name(node_id)),
 		"partner": partner,
 		"partner_genes": partner.genes,
 		"parent": GameState.player_wolf,
+		"litter_size": int(pending_data.get("litter_size", 1)),
 	}
-	GameState.gestation_active = true
-	GameState.gestation_time_left = float(data.get("time_left", 0.0))
-	GameState.gestation_partner = partner
+	GameState.active_gestations.append({
+		"time_left": float(entry_data.get("time_left", 0.0)),
+		"partner": partner,
+		"pending": pending,
+	})
+
+
+func _find_partner_by_archetype(archetype: String) -> PartnerWolf:
+	for node in get_tree().get_nodes_in_group("partner_wolf"):
+		if node is PartnerWolf and (node as PartnerWolf).genes.archetype_id == archetype:
+			return node as PartnerWolf
+	for node in get_tree().get_nodes_in_group("partner_wolf"):
+		if node is PartnerWolf:
+			return node as PartnerWolf
+	return null
+
+
+func _apply_gestation(data: Dictionary) -> void:
+	if not data.get("active", false):
+		return
+	if data.has("entry"):
+		_apply_gestation_entry(data.get("entry", {}))
+		return
+	var pending_data: Dictionary = data.get("pending", {})
+	var partner := _find_partner_by_archetype(pending_data.get("partner_archetype", "forest_wolf"))
+	if partner == null:
+		return
+	var stats := _stats_from_dict(pending_data.get("stats", {}))
+	var node_id: String = pending_data.get("node_id", "wolf_base")
+	var pending := {
+		"stats": stats,
+		"node_id": node_id,
+		"trait_name": pending_data.get("trait_name", EvolutionResolver.get_display_name(node_id)),
+		"partner": partner,
+		"partner_genes": partner.genes,
+		"parent": GameState.player_wolf,
+		"litter_size": int(pending_data.get("litter_size", 1)),
+	}
+	GameState.active_gestations.append({
+		"time_left": float(data.get("time_left", 0.0)),
+		"partner": partner,
+		"pending": pending,
+	})
 
 
 func _serialize_wolf(wolf: Wolf) -> Dictionary:
