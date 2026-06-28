@@ -620,7 +620,7 @@ Steps STEP-01–16 (core), STEP-20–31 (content/polish), STEP-32–35 (Phase 3 
 | ID | Summary |
 |----|---------|
 | STEP-36 | `PackNeedsManager` + `PackHUD` — shared feeding for player + partners + **dependent pups**; pack-size difficulty scaling |
-| STEP-37 | Litters **1–3** per gestation; siblings share trait; spawn cluster beside mother |
+| STEP-37 | Litters **1–3** per gestation; **each pup rolls trait at birth**; spawn cluster beside mother |
 | STEP-38 | `SonWolf` lifecycle: **Pup** (60s) → **Young wolf** (independent, self-feeds) → **Rogue** (+90s, hostile, still genetic heir) |
 
 ### STEP-36 VERIFY
@@ -696,6 +696,67 @@ Steps STEP-01–16 (core), STEP-20–31 (content/polish), STEP-32–35 (Phase 3 
 ### STEP-46 VERIFY
 
 1. Codex panel groups traits by branch; undiscovered show as `???`.
+
+---
+
+## 16. Phase 6 — combat, biomes & session
+
+| ID | Summary |
+|----|---------|
+| STEP-47 | Pack feeding scope — only **gestating** partners + partners **with dependent pups** share player meals; wandering partners self-feed; each pup rolls trait **at birth** |
+| STEP-48 | Hybrid combat — player **auto-bites** nearest predator/rogue/prey in range (cooldown); **E** still prioritizes context interact |
+| STEP-49 | Biome needs — **Tundra** +hunger, **Desert** +thirst while inside biome zones |
+| STEP-50 | Run session HUD — elapsed time + Early/Mid/Late phase; persisted in save |
+
+### STEP-47 VERIFY
+
+1. Mate once — partner appears in Pack HUD during gestation; disappears after pups independent (if no other gestation).
+2. Litter of 2+ may show different trait names in birth toast.
+
+### STEP-48 VERIFY
+
+1. Walk into prey/predator range without pressing E — bites fire on cooldown.
+2. Press E near food still eats (not blocked by auto-bite).
+
+### STEP-49 VERIFY
+
+1. Enter Desert — thirst drains faster (toast on enter).
+2. Enter Tundra — hunger drains slightly faster.
+
+### STEP-50 VERIFY
+
+1. Lineage HUD shows `Run: Xm YYs (Early/Mid/Late)`.
+2. Continue after save — timer restores.
+
+---
+
+## 17. Phase 7 — world depth & presentation
+
+| ID | Summary |
+|----|---------|
+| STEP-51 | **Forest** + **Plains** biome zones with needs modifiers |
+| STEP-52 | Session phase **meta rewards** — Mid/Late in-run refill + New Lineage bonus |
+| STEP-53 | Mate **evolution preview** in interact hint (top 3 likely traits) |
+| STEP-54 | **Prey** + **partner** sprite sheet pipeline (`prey_sheet.png`, `partner_sheet.png`) |
+
+### STEP-51 VERIFY
+
+1. Enter Forest — slightly lower hunger decay; Plains — lower thirst.
+2. Four biome toasts: Forest, Plains, Tundra, Desert.
+
+### STEP-52 VERIFY
+
+1. Survive 8+ min — Mid toast + needs bonus; meta tracks mid runs.
+2. New Lineage after mid run — extra starting refill.
+
+### STEP-53 VERIFY
+
+1. Approach partner — hint shows `[E] Mate Forest blood → Keen Nose, …`.
+
+### STEP-54 VERIFY
+
+1. `prey_sheet.png` and `partner_sheet.png` exist under `assets/sprites/`.
+2. Deer/hare use prey atlas; partners use partner atlas.
 
 ---
 

@@ -7,11 +7,15 @@ func _ready() -> void:
 	EventBus.consume_water.connect(_on_consume_water)
 
 
-func _on_consume_food(_player, amount: float) -> void:
+func _on_consume_food(eater, amount: float) -> void:
+	if eater != GameState.player_wolf:
+		return
 	_feed_pack(amount, true)
 
 
-func _on_consume_water(_player, amount: float) -> void:
+func _on_consume_water(eater, amount: float) -> void:
+	if eater != GameState.player_wolf:
+		return
 	_feed_pack(amount, false)
 
 

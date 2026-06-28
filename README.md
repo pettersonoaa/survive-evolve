@@ -64,7 +64,7 @@ survive-evolve/
 
 ## Status
 
-**Playable prototype** through STEP-46: pack feeding, litters, pup lifecycle, procedural runs, save/load, lineage codex, and meta progression tiers.
+**Playable prototype** through STEP-54: biomes, session meta, mate preview, sprite atlases, hybrid combat, pack rules, meta tiers.
 
 ## Tests (headless)
 

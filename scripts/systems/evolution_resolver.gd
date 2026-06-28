@@ -36,6 +36,28 @@ static func roll_child(parent_node_id: String, partner_genes: WolfGenes) -> Stri
 	return candidates.back()
 
 
+static func get_mate_preview(parent_node_id: String, partner_genes: WolfGenes, limit: int = 3) -> PackedStringArray:
+	var tree := EvolutionRegistry.get_evolution_tree("wolf")
+	if tree == null:
+		return PackedStringArray()
+	var node: EvolutionNode = tree.nodes.get(parent_node_id)
+	if node == null or node.child_ids.is_empty():
+		return PackedStringArray()
+
+	var scored: Array = []
+	for child_id: String in node.child_ids:
+		var weight := float(node.child_base_weights.get(child_id, 1.0))
+		if partner_genes != null:
+			weight *= float(partner_genes.branch_weights.get(child_id, 1.0))
+		scored.append({"weight": weight, "name": get_display_name(child_id)})
+	scored.sort_custom(func(a, b): return a["weight"] > b["weight"])
+
+	var names: PackedStringArray = []
+	for i in mini(limit, scored.size()):
+		names.append(scored[i]["name"])
+	return names
+
+
 static func build_offspring_stats(parent, partner_genes: WolfGenes, child_node_id: String) -> WolfStats:
 	var tree := EvolutionRegistry.get_evolution_tree("wolf")
 	var stats: WolfStats = parent.stats.duplicate_stats()

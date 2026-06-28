@@ -40,7 +40,10 @@ func _process(_delta: float) -> void:
 		if dist > GameConstants.INTERACT_RANGE or dist >= best_dist:
 			continue
 		best_dist = dist
-		best_text = "[E] Hunt deer"
+		if node is PreyAnimal and (node as PreyAnimal).prey_kind == PreyAnimal.PreyKind.HARE:
+			best_text = "[E] Hunt hare"
+		else:
+			best_text = "[E] Hunt deer"
 
 	for node in get_tree().get_nodes_in_group("partner_wolf"):
 		if not node is PartnerWolf:
@@ -89,7 +92,10 @@ func _partner_hint(partner: PartnerWolf, player) -> String:
 		return "[E] Mate (partner needs food)"
 	if not InteractUtils.is_in_mate_range(player, partner):
 		return "[E] Mate (move closer)"
-	return "[E] Mate with %s" % partner.genes.display_tag
+	var preview := EvolutionResolver.get_mate_preview(player.current_node_id, partner.genes, 3)
+	if preview.is_empty():
+		return "[E] Mate with %s" % partner.genes.display_tag
+	return "[E] Mate %s → %s" % [partner.genes.display_tag, ", ".join(preview)]
 
 
 func _resource_hint(node: Node) -> String:

@@ -8,6 +8,9 @@ var pending_succession_after_gestation: bool = false
 var modal_ui_open: bool = false
 var run_seed: int = 0
 var current_season: String = "spring"
+var run_elapsed_seconds: float = 0.0
+var session_mid_rewarded: bool = false
+var session_late_rewarded: bool = false
 
 
 var gestation_active: bool:
@@ -65,6 +68,9 @@ func reset_for_new_run() -> void:
 	modal_ui_open = false
 	run_seed = 0
 	current_season = "spring"
+	run_elapsed_seconds = 0.0
+	session_mid_rewarded = false
+	session_late_rewarded = false
 
 
 func register_heir(wolf: Node2D) -> void:
@@ -124,10 +130,17 @@ func get_pack_size() -> int:
 	var count := 0
 	if player_wolf != null and is_instance_valid(player_wolf) and not player_wolf.is_dead:
 		count += 1
+	count += get_active_pack_partner_count()
+	count += get_dependent_pup_count()
+	return count
+
+
+func get_active_pack_partner_count() -> int:
+	var count := 0
 	for node in get_tree().get_nodes_in_group("partner_wolf"):
 		if node is PartnerWolf and is_instance_valid(node) and not node.is_dead:
-			count += 1
-	count += get_dependent_pup_count()
+			if (node as PartnerWolf).is_active_pack_member():
+				count += 1
 	return count
 
 
@@ -149,7 +162,9 @@ func get_pack_members(include_player: bool = false) -> Array[Wolf]:
 			members.append(player)
 	for node in get_tree().get_nodes_in_group("partner_wolf"):
 		if node is PartnerWolf and is_instance_valid(node) and not node.is_dead:
-			members.append(node as Wolf)
+			var partner := node as PartnerWolf
+			if partner.is_active_pack_member():
+				members.append(partner)
 	for heir in get_living_heirs():
 		if heir is SonWolf and (heir as SonWolf).is_pack_dependent():
 			members.append(heir as Wolf)

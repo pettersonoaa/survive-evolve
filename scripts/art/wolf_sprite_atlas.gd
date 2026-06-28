@@ -10,8 +10,12 @@ static func build_sprite_frames(body_color: Color, body_size: Vector2) -> Sprite
 	if ResourceLoader.exists(SHEET_PATH):
 		var sheet := load(SHEET_PATH) as Texture2D
 		if sheet != null:
-			return _frames_from_sheet(sheet, body_size)
+			return build_sprite_frames_from_sheet(sheet, body_size)
 	return _frames_procedural(body_color, body_size)
+
+
+static func build_sprite_frames_from_sheet(sheet: Texture2D, body_size: Vector2) -> SpriteFrames:
+	return _frames_from_sheet(sheet, body_size)
 
 
 static func _frames_from_sheet(sheet: Texture2D, body_size: Vector2) -> SpriteFrames:

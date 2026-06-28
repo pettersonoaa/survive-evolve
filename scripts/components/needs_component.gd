@@ -56,6 +56,13 @@ func _process(delta: float) -> void:
 		if territory != null and territory.has_method("is_in_territory") and wolf is Node2D:
 			if territory.is_in_territory((wolf as Node2D).global_position):
 				decay_scale *= GameConstants.TERRITORY_NEEDS_MULT
+		if wolf is Node2D:
+			for node in tree.get_nodes_in_group("biome_zone"):
+				if node is BiomeZone and (node as BiomeZone).contains_point((wolf as Node2D).global_position):
+					var biome := node as BiomeZone
+					hunger_mult *= biome.get_hunger_decay_mult()
+					thirst_mult *= biome.get_thirst_decay_mult()
+					break
 
 	hunger = maxf(hunger - hunger_decay_per_sec * metabolism * hunger_mult * decay_scale * delta, 0.0)
 	thirst = maxf(thirst - thirst_decay_per_sec * metabolism * thirst_mult * decay_scale * delta, 0.0)

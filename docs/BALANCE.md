@@ -47,3 +47,27 @@ Inside `TERRITORY_RADIUS` (320px): pack needs decay ×0.82, predators slower cha
 | Food yield | 40 | 22 |
 | Flee range | 150 | 180 |
 | Speed | 36 / 105 | 48 / 130 |
+
+## Biomes (inside zone)
+
+| Biome | Hunger mult | Thirst mult |
+|-------|-------------|-------------|
+| Tundra | 1.08 | 1.0 |
+| Desert | 1.05 | 1.18 |
+| Forest | 0.95 | 0.98 |
+| Plains | 1.02 | 0.96 |
+
+## Session meta (New Lineage bonus)
+
+| Milestone | In-run bonus | Meta starting bonus |
+|-----------|--------------|---------------------|
+| Mid (8 min) | +12 needs once | +4 after any mid run |
+| Late (15 min) | +8 needs once | +8 after any late run |
+
+## Session phases (HUD)
+
+| Phase | After |
+|-------|-------|
+| Early | 0 min |
+| Mid | 8 min |
+| Late | 15 min |

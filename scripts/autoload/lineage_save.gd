@@ -100,6 +100,9 @@ func save_run() -> void:
 		"world_content": {"x": world_content_pos.x, "y": world_content_pos.y},
 		"gestations": _serialize_gestations(),
 		"gestation": _serialize_gestation(),
+		"run_elapsed_seconds": GameState.run_elapsed_seconds,
+		"session_mid_rewarded": GameState.session_mid_rewarded,
+		"session_late_rewarded": GameState.session_late_rewarded,
 	}
 	var json := JSON.stringify(data, "\t")
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -119,6 +122,9 @@ func load_into_world(world: Node2D) -> void:
 	var lineage_data: Dictionary = data.get("lineage", {})
 	GameState.lineage.generation = int(lineage_data.get("generation", 0))
 	GameState.lineage.traits_seen.assign(lineage_data.get("traits_seen", []))
+	GameState.run_elapsed_seconds = float(data.get("run_elapsed_seconds", 0.0))
+	GameState.session_mid_rewarded = bool(data.get("session_mid_rewarded", false))
+	GameState.session_late_rewarded = bool(data.get("session_late_rewarded", false))
 
 	var ysort := world.get_node_or_null("WorldContent/YSort") as Node2D
 	var player := world.get_node_or_null("WorldContent/YSort/PlayerWolf") as Wolf
@@ -179,15 +185,9 @@ func _serialize_gestation_entry(entry: Dictionary) -> Dictionary:
 		var partner := pending["partner"] as PartnerWolf
 		if partner.genes != null:
 			partner_archetype = partner.genes.archetype_id
-	var stats_dict := {}
-	if pending.get("stats") is WolfStats:
-		stats_dict = _serialize_stats(pending["stats"] as WolfStats)
 	return {
 		"time_left": float(entry.get("time_left", 0.0)),
 		"pending": {
-			"node_id": str(pending.get("node_id", "wolf_base")),
-			"trait_name": str(pending.get("trait_name", "")),
-			"stats": stats_dict,
 			"partner_archetype": partner_archetype,
 			"litter_size": int(pending.get("litter_size", 1)),
 		},
@@ -213,12 +213,7 @@ func _apply_gestation_entry(entry_data: Dictionary) -> void:
 	var partner := _find_partner_by_archetype(pending_data.get("partner_archetype", "forest_wolf"))
 	if partner == null:
 		return
-	var stats := _stats_from_dict(pending_data.get("stats", {}))
-	var node_id: String = pending_data.get("node_id", "wolf_base")
 	var pending := {
-		"stats": stats,
-		"node_id": node_id,
-		"trait_name": pending_data.get("trait_name", EvolutionResolver.get_display_name(node_id)),
 		"partner": partner,
 		"partner_genes": partner.genes,
 		"parent": GameState.player_wolf,
@@ -251,12 +246,7 @@ func _apply_gestation(data: Dictionary) -> void:
 	var partner := _find_partner_by_archetype(pending_data.get("partner_archetype", "forest_wolf"))
 	if partner == null:
 		return
-	var stats := _stats_from_dict(pending_data.get("stats", {}))
-	var node_id: String = pending_data.get("node_id", "wolf_base")
 	var pending := {
-		"stats": stats,
-		"node_id": node_id,
-		"trait_name": pending_data.get("trait_name", EvolutionResolver.get_display_name(node_id)),
 		"partner": partner,
 		"partner_genes": partner.genes,
 		"parent": GameState.player_wolf,

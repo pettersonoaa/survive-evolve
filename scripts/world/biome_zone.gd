@@ -26,3 +26,31 @@ func _process(_delta: float) -> void:
 
 func contains_point(global_pos: Vector2) -> bool:
 	return global_position.distance_to(global_pos) <= zone_radius
+
+
+func get_hunger_decay_mult() -> float:
+	match biome_id:
+		"tundra":
+			return 1.08
+		"desert":
+			return 1.05
+		"forest":
+			return 0.95
+		"plains":
+			return 1.02
+		_:
+			return 1.0
+
+
+func get_thirst_decay_mult() -> float:
+	match biome_id:
+		"tundra":
+			return 1.0
+		"desert":
+			return 1.18
+		"forest":
+			return 0.98
+		"plains":
+			return 0.96
+		_:
+			return 1.0

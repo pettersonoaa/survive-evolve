@@ -41,6 +41,9 @@ const HEIR_INDEPENDENT_NEEDS_DECAY_MULT := 0.92
 const HEIR_ROGUE_DAMAGE := 13.0
 const HEIR_ROGUE_ATTACK_COOLDOWN := 1.15
 const ATTACK_COOLDOWN := 0.55
+const AUTO_BITE_ENABLED := true
+const SESSION_EARLY_SECONDS := 480.0
+const SESSION_MID_SECONDS := 900.0
 const MINIMAP_RADIUS := 1500.0
 const MINIMAP_SIZE := 148.0
 ## Prototype toggle: no hunger/thirst gate for mating.

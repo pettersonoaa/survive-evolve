@@ -41,7 +41,7 @@ func _rebuild_rows() -> void:
 		child.queue_free()
 
 	var members := GameState.get_pack_members(false)
-	_title.text = "Pack (%d) — feed together" % GameState.get_pack_size()
+	_title.text = "Pack (%d) — gestating partners + pups" % GameState.get_pack_size()
 	if members.is_empty():
 		var empty := Label.new()
 		empty.text = "No pack members yet"

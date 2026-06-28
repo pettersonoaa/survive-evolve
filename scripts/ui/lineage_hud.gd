@@ -4,6 +4,7 @@ extends Control
 @onready var _trait_label: Label = $Panel/TraitLabel
 @onready var _heir_label: Label = $Panel/HeirLabel
 @onready var _threat_label: Label = $Panel/ThreatLabel
+@onready var _session_label: Label = $Panel/SessionLabel
 @onready var _gestation_label: Label = $Panel/GestationLabel
 
 var _flash_time := 0.0
@@ -22,8 +23,9 @@ func _process(delta: float) -> void:
 		_gen_label.text = "Gen: %d" % GameState.lineage.generation
 		_trait_label.text = "Trait: %s" % wolf.trait_display_name
 		GameState.prune_dead_heirs()
-		_heir_label.text = "Heirs: %d (pack %d)" % [GameState.living_heirs.size(), GameState.get_dependent_pup_count()]
+		_heir_label.text = "Heirs: %d (pups %d)" % [GameState.living_heirs.size(), GameState.get_dependent_pup_count()]
 		_threat_label.text = "Threat: %s (pack %d)" % [_threat_tier(), GameState.get_pack_size()]
+		_session_label.text = "Run: %s" % _format_session(GameState.run_elapsed_seconds)
 	if GameState.gestation_active:
 		var parts: PackedStringArray = []
 		for entry in GameState.active_gestations:
@@ -73,3 +75,15 @@ func _threat_tier() -> String:
 	if pressure < 8:
 		return "Harsh"
 	return "Deadly"
+
+
+func _format_session(seconds: float) -> String:
+	var total := maxi(int(seconds), 0)
+	var minutes := total / 60
+	var secs := total % 60
+	var phase := "Early"
+	if seconds >= GameConstants.SESSION_MID_SECONDS:
+		phase = "Late"
+	elif seconds >= GameConstants.SESSION_EARLY_SECONDS:
+		phase = "Mid"
+	return "%dm %02ds (%s)" % [minutes, secs, phase]

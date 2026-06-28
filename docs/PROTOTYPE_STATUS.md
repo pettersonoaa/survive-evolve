@@ -43,6 +43,14 @@
 | STEP-44 | yes | 2026-06-26 | Game over / victory meta summary |
 | STEP-45 | yes | 2026-06-26 | Meta milestones (Scout/Hunter/Alpha) — starting bonuses |
 | STEP-46 | yes | 2026-06-26 | Codex v2 — branch sections + hidden traits |
+| STEP-47 | yes | 2026-06-26 | Active pack feeding + per-pup trait rolls at birth |
+| STEP-48 | yes | 2026-06-26 | Hybrid auto-bite combat (predator/rogue/prey) |
+| STEP-49 | yes | 2026-06-26 | Biome needs modifiers (tundra/desert) |
+| STEP-50 | yes | 2026-06-26 | Run session timer HUD + save persistence |
+| STEP-51 | yes | 2026-06-26 | Forest + Plains biome zones |
+| STEP-52 | yes | 2026-06-26 | Session phase meta rewards (Mid/Late) |
+| STEP-53 | yes | 2026-06-26 | Mate evolution preview in interact hint |
+| STEP-54 | yes | 2026-06-26 | Prey + partner sprite sheet atlases |
 
 ## Agent review (post-pack estimated)
 
@@ -57,8 +65,8 @@
 1. **Main menu** — Continue saved lineage or New Lineage (procedural scatter).
 2. **WASD** — move; **E** — eat, drink, hunt deer/hares, bite predators/rogue heirs, mate.
 3. Find partners (forest / plains / tundra / desert blood) — mate with several in parallel (one gestation per partner).
-4. **30s gestation** → **1–3 pups** born beside the mother; trait + bloodline color applied.
-5. **Feed the pack** — E at food/water refills you + partners + **dependent pups** (Pack HUD).
+4. **30s gestation** → **1–3 pups** beside mother; **each pup rolls its own trait**; bloodline color from partner.
+5. **Feed the active pack** — E refills you + gestating partners + partners guarding pups + **dependent pups** (Pack HUD).
 6. **~60s** — pups grow and leave the pack; hunt alone (still genetic heirs).
 7. **~90s later** — independent pups may turn **rogue** and attack; still selectable as heirs on death.
 8. Den + **territory** (320px) eases needs and slows predators; **seasons** cycle every 120s.

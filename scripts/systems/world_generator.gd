@@ -142,7 +142,9 @@ static func _archetype_biome(archetype_id: String) -> String:
 			return "tundra"
 		"desert_wolf":
 			return "desert"
-		"plains_wolf":
+		"forest_wolf":
 			return "forest"
+		"plains_wolf":
+			return "plains"
 		_:
 			return "forest"

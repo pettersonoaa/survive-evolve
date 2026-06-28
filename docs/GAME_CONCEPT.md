@@ -26,6 +26,7 @@ You are a wolf building a bloodline in a hostile open map. Survival is immediate
 | Growth | Pups age → leave pack → self-sufficient → may turn rogue (hostile, still heirs) |
 | Succession | Die → pick an heir (pup, young wolf, or rogue) → continue lineage |
 | Meta | Lineage Codex + **LineageMeta** tiers (Scout/Hunter/Alpha bonuses) |
+| Combat | Auto-bite in range + **E** for explicit interact |
 
 Full rules: `DESIGN_DECISIONS.md`. Implementation tracker: `PROTOTYPE_STATUS.md`.
 
@@ -42,7 +43,5 @@ See `RENDERING_25D.md` and `ART_PIPELINE.md`.
 
 ## Open questions (future)
 
-- Auto-attack vs aimed attacks (or hybrid)
-- Deeper meta between runs beyond codex
-- More species / biomes
-- Session length tuning (15 / 30 / 45 min targets)
+- More species / biomes (forest/plains zones)
+- Session length reward tuning beyond HUD phases

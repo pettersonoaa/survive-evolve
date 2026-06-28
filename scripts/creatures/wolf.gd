@@ -34,6 +34,7 @@ func _process(delta: float) -> void:
 	if is_player_controlled:
 		_handle_movement(delta)
 		global_position = Vector2.ZERO
+		_try_auto_bite()
 	elif is_heir:
 		_follow_as_heir(delta)
 	_update_motion_anim()
@@ -129,41 +130,18 @@ func _has_approach_target() -> bool:
 	return false
 
 
+func _try_auto_bite() -> void:
+	if not GameConstants.AUTO_BITE_ENABLED or _attack_cooldown > 0.0:
+		return
+	var target := _pick_combat_target()
+	if target != null:
+		_try_attack(target)
+
+
 func _pick_interact_target() -> Node:
-	var best_predator: PredatorWolf = null
-	var best_predator_dist := GameConstants.INTERACT_RANGE + 1.0
-	for node in get_tree().get_nodes_in_group("predator_wolf"):
-		if not node is PredatorWolf:
-			continue
-		var predator := node as PredatorWolf
-		if predator.is_dead:
-			continue
-		var dist := InteractUtils.distance_to(self, predator)
-		if dist <= GameConstants.INTERACT_RANGE and dist < best_predator_dist:
-			best_predator_dist = dist
-			best_predator = predator
-	if best_predator != null:
-		return best_predator
-
-	for heir in GameState.get_living_heirs():
-		if heir is SonWolf and (heir as SonWolf).is_hostile():
-			var rogue := heir as SonWolf
-			var dist := InteractUtils.distance_to(self, rogue)
-			if dist <= GameConstants.INTERACT_RANGE and dist < best_predator_dist:
-				best_predator_dist = dist
-				return rogue
-
-	var best_prey: Node = null
-	var best_prey_dist := GameConstants.INTERACT_RANGE + 1.0
-	for node in get_tree().get_nodes_in_group("prey_animal"):
-		if node.get("is_dead"):
-			continue
-		var dist := InteractUtils.distance_to(self, node)
-		if dist <= GameConstants.INTERACT_RANGE and dist < best_prey_dist:
-			best_prey_dist = dist
-			best_prey = node
-	if best_prey != null:
-		return best_prey
+	var combat := _pick_combat_target()
+	if combat != null:
+		return combat
 
 	var best_partner: PartnerWolf = null
 	var best_partner_dist := GameConstants.MATE_RANGE + 1.0
@@ -210,6 +188,40 @@ func _pick_interact_target() -> Node:
 			return node
 
 	return in_range[0]["node"]
+
+
+func _pick_combat_target() -> Node:
+	var best_dist := GameConstants.INTERACT_RANGE + 1.0
+	var best: Node = null
+
+	for node in get_tree().get_nodes_in_group("predator_wolf"):
+		if not node is PredatorWolf:
+			continue
+		var predator := node as PredatorWolf
+		if predator.is_dead:
+			continue
+		var dist := InteractUtils.distance_to(self, predator)
+		if dist <= GameConstants.INTERACT_RANGE and dist < best_dist:
+			best_dist = dist
+			best = predator
+
+	for heir in GameState.get_living_heirs():
+		if heir is SonWolf and (heir as SonWolf).is_hostile():
+			var rogue := heir as SonWolf
+			var dist := InteractUtils.distance_to(self, rogue)
+			if dist <= GameConstants.INTERACT_RANGE and dist < best_dist:
+				best_dist = dist
+				best = rogue
+
+	for node in get_tree().get_nodes_in_group("prey_animal"):
+		if node.get("is_dead"):
+			continue
+		var dist := InteractUtils.distance_to(self, node)
+		if dist <= GameConstants.INTERACT_RANGE and dist < best_dist:
+			best_dist = dist
+			best = node
+
+	return best
 
 
 func _fail_message_for(node: Node) -> void:

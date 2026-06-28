@@ -3,6 +3,8 @@ class_name PartnerWolf
 
 @export var archetype_id: String = "forest_wolf"
 
+const _PartnerAtlas = preload("res://scripts/art/partner_sprite_atlas.gd")
+
 @export var wander_speed := 48.0
 var _wander_dir := Vector2.RIGHT
 var _wander_timer := 0.0
@@ -16,13 +18,31 @@ func _ready() -> void:
 	body_color = EvolutionRegistry.get_partner_color(archetype_id)
 	add_to_group("interact_handlers")
 	add_to_group("partner_wolf")
-	add_to_group("pack_member")
 	super._ready()
 	needs.set_process(true)
 	needs.refill()
 	_add_tag_label()
 	_wander_timer = randf_range(2.0, 4.0)
 	EventBus.pack_assist_requested.connect(_on_pack_assist_requested)
+
+
+func _apply_body_sprite() -> void:
+	_body.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_body.centered = false
+	if use_walk_animations:
+		_body.sprite_frames = _PartnerAtlas.build_sprite_frames(body_color, body_size)
+		_update_animation()
+	else:
+		var tex := _PartnerAtlas.build_sprite_frames(body_color, body_size).get_frame_texture(&"idle", 0)
+		var frames := SpriteFrames.new()
+		frames.add_animation(&"idle")
+		frames.add_frame(&"idle", tex)
+		_body.sprite_frames = frames
+		_body.play(&"idle")
+
+
+func is_active_pack_member() -> bool:
+	return GameState.is_partner_gestating(self) or _has_living_offspring()
 
 
 func register_offspring(son: SonWolf) -> void:
@@ -48,12 +68,20 @@ func _process(delta: float) -> void:
 	if is_dead:
 		return
 	super._process(delta)
-	if _is_gestation_partner():
-		_follow_player_during_gestation(delta)
-		return
-	if _has_living_offspring():
-		_stay_near_offspring(delta)
-		return
+	if is_active_pack_member():
+		if _is_gestation_partner():
+			_follow_player_during_gestation(delta)
+			return
+		if _has_living_offspring():
+			_stay_near_offspring(delta)
+			return
+	_independent_survival(delta)
+
+
+func _independent_survival(delta: float) -> void:
+	if needs.hunger <= 40.0 or needs.thirst <= 40.0:
+		if _seek_resource(delta):
+			return
 	var player := GameState.player_wolf
 	if player != null and is_instance_valid(player) and not player.is_dead:
 		if global_position.distance_to(player.global_position) < GameConstants.PARTNER_IDLE_RANGE:
@@ -65,6 +93,40 @@ func _process(delta: float) -> void:
 		_wander_dir = Vector2.RIGHT.rotated(randf() * TAU)
 	global_position += _wander_dir * wander_speed * delta
 	_last_move_dir = _wander_dir
+
+
+func _seek_resource(delta: float) -> bool:
+	var want_food := needs.hunger <= needs.thirst
+	var best: Node2D = null
+	var best_dist := GameConstants.INTERACT_RANGE + 1.0
+	for node in get_tree().get_nodes_in_group("interact_handlers"):
+		if not node.has_method("handle_interact"):
+			continue
+		if node is PartnerWolf or node is SonWolf:
+			continue
+		if node is FoodCarcass:
+			if want_food and not (node as FoodCarcass).depleted:
+				var dist := global_position.distance_to(node.global_position)
+				if dist < best_dist:
+					best_dist = dist
+					best = node
+		elif node is WaterSource:
+			if not want_food and not (node as WaterSource).depleted:
+				var dist := global_position.distance_to(node.global_position)
+				if dist < best_dist:
+					best_dist = dist
+					best = node
+	if best == null:
+		return false
+	var offset := best.global_position - global_position
+	var dist := offset.length()
+	if dist > GameConstants.INTERACT_RANGE:
+		_last_move_dir = offset.normalized()
+		global_position += offset.normalized() * wander_speed * 0.75 * delta
+		return true
+	_last_move_dir = Vector2.ZERO
+	best.handle_interact(self)
+	return true
 
 
 func _is_gestation_partner() -> bool:

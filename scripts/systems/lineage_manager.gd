@@ -38,28 +38,19 @@ func try_mate(player, partner: PartnerWolf) -> bool:
 		if not player.needs.is_fed_for_mate() or not partner.needs.is_fed_for_mate():
 			return false
 
-	var child_node_id := EvolutionResolver.roll_child(player.current_node_id, partner.genes)
-	var offspring_stats := EvolutionResolver.build_offspring_stats(player, partner.genes, child_node_id)
-	var trait_name := EvolutionResolver.get_display_name(child_node_id)
 	var litter_size := randi_range(GameConstants.LITTER_SIZE_MIN, GameConstants.LITTER_SIZE_MAX)
 
 	var pending := {
-		"stats": offspring_stats,
-		"node_id": child_node_id,
-		"trait_name": trait_name,
 		"partner": partner,
 		"partner_genes": partner.genes,
 		"parent": player,
 		"litter_size": litter_size,
 	}
 	GameState.add_gestation(partner, pending)
-	GameState.lineage.record_trait(trait_name)
 	EventBus.mate_started.emit(player, partner)
-	EventBus.evolution_applied.emit(player, child_node_id, trait_name)
 	EventBus.ui_toast.emit(
-		"Mating with %s — %s, %d pup(s) in %ds" % [
+		"Mating with %s — %d pup(s) gestating (%ds)" % [
 			partner.genes.display_tag,
-			trait_name,
 			litter_size,
 			int(GameConstants.GESTATION_SECONDS),
 		],
@@ -81,27 +72,40 @@ func _finish_gestation(entry: Dictionary) -> void:
 	var litter_size: int = int(data.get("litter_size", 1))
 	litter_size = clampi(litter_size, GameConstants.LITTER_SIZE_MIN, GameConstants.LITTER_SIZE_MAX)
 
+	var partner_genes: WolfGenes = data.get("partner_genes")
+	var parent_node_id := "wolf_base"
+	if parent != null and parent.get("current_node_id"):
+		parent_node_id = parent.current_node_id
+
 	var born_pups: Array[SonWolf] = []
+	var trait_names: PackedStringArray = []
 	for i in litter_size:
+		var child_node_id := EvolutionResolver.roll_child(parent_node_id, partner_genes)
+		var offspring_stats := EvolutionResolver.build_offspring_stats(parent, partner_genes, child_node_id)
+		var trait_name := EvolutionResolver.get_display_name(child_node_id)
 		var son: SonWolf = _son_scene.instantiate() as SonWolf
 		_y_sort.add_child(son)
 		son.global_position = _birth_position(partner, parent, i)
-		son.setup_from_birth(data["stats"], data["node_id"], data["partner_genes"])
+		son.setup_from_birth(offspring_stats, child_node_id, partner_genes)
 		born_pups.append(son)
+		trait_names.append(trait_name)
+		GameState.lineage.record_trait(trait_name)
+		EventBus.evolution_applied.emit(parent, child_node_id, trait_name)
 		if partner is PartnerWolf and is_instance_valid(partner):
 			partner.register_offspring(son)
 
 	GameState.lineage.generation += 1
-	GameState.lineage.record_trait(born_pups[0].trait_display_name if not born_pups.is_empty() else "")
 
 	var partner_tag := ""
-	if data["partner_genes"] is WolfGenes:
-		partner_tag = data["partner_genes"].display_tag
-	var trait_name: String = data.get("trait_name", born_pups[0].trait_display_name if not born_pups.is_empty() else "")
+	if partner_genes != null:
+		partner_tag = partner_genes.display_tag
 	if litter_size == 1:
-		EventBus.ui_toast.emit("Pup born: %s (%s)" % [trait_name, partner_tag], 3.0)
+		EventBus.ui_toast.emit("Pup born: %s (%s)" % [trait_names[0], partner_tag], 3.0)
 	else:
-		EventBus.ui_toast.emit("%d pups born: %s (%s)" % [litter_size, trait_name, partner_tag], 3.0)
+		EventBus.ui_toast.emit(
+			"%d pups born: %s (%s)" % [litter_size, ", ".join(trait_names), partner_tag],
+			3.5,
+		)
 
 	for son in born_pups:
 		EventBus.mate_completed.emit(parent, partner, son)

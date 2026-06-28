@@ -10,7 +10,7 @@ anchor_right = 1.0
 offset_left = -320.0
 offset_top = 12.0
 offset_right = -12.0
-offset_bottom = 140.0
+offset_bottom = 156.0
 grow_horizontal = 0
 script = ExtResource("1_script")
 
@@ -34,6 +34,10 @@ text = "Heirs: 0"
 [node name="ThreatLabel" type="Label" parent="Panel"]
 layout_mode = 2
 text = "Threat: Calm"
+
+[node name="SessionLabel" type="Label" parent="Panel"]
+layout_mode = 2
+text = "Run: 0m 00s (Early)"
 
 [node name="GestationLabel" type="Label" parent="Panel"]
 layout_mode = 2

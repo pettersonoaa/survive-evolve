@@ -13,7 +13,7 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 | Pillar | Choice |
 |--------|--------|
 | **Lineage** | Multiple pups per life; on death pick which heir to play |
-| **Litters** | Each gestation yields **1–3 pups** (siblings share rolled trait) |
+| **Litters** | Each gestation yields **1–3 pups**; siblings may roll **different** traits |
 | **Heir loss** | Pup dies → parent continues, can remate |
 | **Chain** | Each generation must mate before dying or game over |
 | **Evolution** | At **mate time** (gestation **30s**), per-wolf tree position |
@@ -52,7 +52,7 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 | **B** | One living heir at a time. |
 | **C** | **Multiple pups.** On death, pick which pup to play. |
 
-**YOUR ANSWER:** **C** — Multiple pups per life. Each successful gestation spawns a **litter of 1–3 pups** (DEC-22). Siblings from the same litter share the rolled evolution trait/stats. On player death, show heir picker UI (list living pups). Remating can add more litters over time. Pups stay in the world as NPC heirs until selected or they die.
+**YOUR ANSWER:** **C** — Multiple pups per life. Each successful gestation spawns a **litter of 1–3 pups** (DEC-22). Siblings from the same litter roll evolution **independently at birth**. On player death, show heir picker UI (list living pups). Remating can add more litters over time. Pups stay in the world as NPC heirs until selected or they die.
 
 ---
 
@@ -94,7 +94,7 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 | **B** | Player picks from rolled options. |
 | **C** | **At mate time** — pups get trait; death only transfers control. |
 
-**YOUR ANSWER:** **C** — On successful mate (E + requirements), roll evolution **once per gestation** and store on pending offspring. After gestation (DEC-09), **all pups in the litter** spawn with that rolled trait/stats. Death does **not** roll evolution; it triggers succession / heir picker.
+**YOUR ANSWER:** **C** — On successful mate (E + requirements), store gestation only (partner, litter size). At birth, **each pup** rolls evolution independently. Death does **not** roll evolution; it triggers succession / heir picker.
 
 ---
 
@@ -211,7 +211,7 @@ Visible tags on partners and in birth toasts (DEC-18). Full weights in `docs/EVO
 | **B** | **1–3 pups** per gestation. |
 | **C** | Fixed 3. |
 
-**YOUR ANSWER:** **B** — Roll `litter_size` ∈ [1, 3] at mate time. All siblings in a litter share the same rolled trait/stats. Pup **sprite color** reflects partner bloodline (`get_offspring_color`). Slightly offset spawn positions around the mother.
+**YOUR ANSWER:** **B** — Roll `litter_size` ∈ [1, 3] at mate time. Each pup rolls trait/stats **at birth** (siblings may differ). Pup **sprite color** reflects partner bloodline (`get_offspring_color`). Slightly offset spawn positions around the mother.
 
 ---
 
@@ -326,11 +326,10 @@ Visible tags on partners and in birth toasts (DEC-18). Full weights in `docs/EVO
 
 | Topic | Behavior |
 |-------|----------|
-| Pack members | Player + partners + **dependent pups only** |
-| Pup lifecycle | **Pup** (pack-fed, grows) → **Young wolf** (independent, self-feeds) → **Rogue** (hostile, still genetic heir) |
-| Independence | ~**50s** after birth — leaves pack, hunts food/water alone |
-| Rogue | ~**70s** after independence — attacks pack; still selectable as heir on death |
-| Feeding | Player E-interact feeds **dependent pups** + partners only |
+| Pack members | Player + **gestating partners** + partners **guarding dependent pups** + dependent pups |
+| Independence | ~**60s** after birth — leaves pack, hunts food/water alone |
+| Rogue | ~**90s** after independence — attacks pack; still selectable as heir on death |
+| Feeding | Player E-interact feeds **active pack** only; wandering partners self-sustain |
 | Difficulty | More pack members → higher needs pressure + more predators + threat tier |
 | Den | Safe zone for pups (reduced decay); **birth is at mother**, not den |
 | Pack assist | Gestation partner joins player bites; pups assist when heir |

@@ -3,7 +3,7 @@ class_name PreyAnimal
 
 enum PreyKind { DEER, HARE }
 
-const _PreySprites = preload("res://scripts/art/prey_sprite_factory.gd")
+const _PreyAtlas = preload("res://scripts/art/prey_sprite_atlas.gd")
 const _CarcassScene = preload("res://scenes/resources/food_carcass.tscn")
 
 @export var prey_kind: PreyKind = PreyKind.DEER
@@ -46,14 +46,8 @@ func _apply_kind_defaults() -> void:
 
 
 func _apply_body_sprite() -> void:
-	var tex: Texture2D
-	if prey_kind == PreyKind.HARE:
-		tex = _PreySprites.create_hare(body_color, body_size)
-	else:
-		tex = _PreySprites.create(body_color, body_size)
-	var frames := SpriteFrames.new()
-	frames.add_animation(&"idle")
-	frames.add_frame(&"idle", tex)
+	var frames := _PreyAtlas.build_sprite_frames(prey_kind, body_color, body_size)
+	frames.set_animation_speed(&"idle", 3.0)
 	_body.sprite_frames = frames
 	_body.centered = false
 	_body.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
