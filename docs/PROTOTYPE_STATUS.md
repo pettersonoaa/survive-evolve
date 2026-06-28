@@ -21,6 +21,8 @@
 | STEP-22 | yes | 2026-06-27 | Wolf den safe zone, heirs spawn and rest at den |
 | STEP-23 | yes | 2026-06-27 | JSON save/load lineage, player stats, heirs, gestation |
 | STEP-24 | yes | 2026-06-27 | Tundra + Desert biome zones, Desert blood partner |
+| STEP-25 | yes | 2026-06-27 | Main menu: Continue / New lineage |
+| STEP-26 | yes | 2026-06-27 | Map extent 48 (DEC-21), game over returns to menu |
 
 ## Agent review (post-polish estimated)
 

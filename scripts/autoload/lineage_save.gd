@@ -5,6 +5,7 @@ const SAVE_VERSION := 1
 const AUTOSAVE_INTERVAL := 45.0
 
 var _skip_load_once := false
+var _load_requested := false
 var _autosave_timer := 0.0
 
 @onready var _son_scene: PackedScene = preload("res://scenes/creatures/son_wolf.tscn")
@@ -35,7 +36,7 @@ func has_save() -> bool:
 
 
 func should_load_on_start() -> bool:
-	if _skip_load_once or not has_save():
+	if _skip_load_once or not _load_requested or not has_save():
 		return false
 	for arg in OS.get_cmdline_args():
 		if arg.contains("integration_runner") or arg.contains("gestation_succession"):
@@ -43,9 +44,18 @@ func should_load_on_start() -> bool:
 	return true
 
 
+func request_load() -> void:
+	_load_requested = true
+
+
+func peek_save() -> Dictionary:
+	return _read_save()
+
+
 func mark_new_run() -> void:
 	delete_save()
 	_skip_load_once = true
+	_load_requested = false
 
 
 func clear_skip_load_once() -> void:

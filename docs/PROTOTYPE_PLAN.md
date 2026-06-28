@@ -594,6 +594,8 @@ World (world_25d.gd)
 | STEP-22 | Den/home safe zone for son |
 | STEP-23 | Save/load lineage + tree to disk |
 | STEP-24 | Second biome + second partner archetype |
+| STEP-25 | Main menu (Continue / New lineage) |
+| STEP-26 | Expanded map scope (DEC-21) |
 
 ---
 
