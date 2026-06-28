@@ -3,18 +3,20 @@ class_name Entity25D
 ## Base for Romestead-style 2.5D entities. Node position = feet on the ground.
 ## Y-sort parent uses position.y for depth; Visual is lifted above the feet.
 
+const _SpriteFactory = preload("res://scripts/art/wolf_sprite_factory.gd")
+
 
 @export var body_size := Vector2(28.0, 44.0)
 @export var body_color := Color(0.85, 0.72, 0.45, 1.0)
 @export var visual_lift := 0.0
 
 @onready var _visual: Node2D = $Visual
-@onready var _body: Polygon2D = $Visual/Body
+@onready var _body: Sprite2D = $Visual/Body
 @onready var _shadow: Polygon2D = $Shadow
 
 
 func _ready() -> void:
-	_body.color = body_color
+	_apply_body_sprite()
 	_update_geometry()
 
 
@@ -23,15 +25,19 @@ func _process(_delta: float) -> void:
 	_update_shadow()
 
 
+func _apply_body_sprite() -> void:
+	_body.texture = _SpriteFactory.create(body_color, body_size)
+	_body.centered = false
+	_body.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+
+
 func _update_geometry() -> void:
-	var half_w := body_size.x * 0.5
-	var h := body_size.y
-	_body.polygon = PackedVector2Array([
-		Vector2(-half_w, -h),
-		Vector2(half_w, -h),
-		Vector2(half_w, 0.0),
-		Vector2(-half_w, 0.0),
-	])
+	if _body.texture != null:
+		var tex_size := _body.texture.get_size()
+		if tex_size.x > 0.0 and tex_size.y > 0.0:
+			_body.scale = Vector2(body_size.x / tex_size.x, body_size.y / tex_size.y)
+			_body.position.x = -body_size.x * 0.5
+			_body.position.y = -body_size.y
 	_update_shadow()
 
 

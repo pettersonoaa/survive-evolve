@@ -24,7 +24,7 @@ func setup_from_birth(birth_stats: WolfStats, node_id: String, partner_genes: Wo
 	health = stats.max_health
 	body_size = Vector2(20.0, 32.0)
 	if is_node_ready():
-		_body.color = body_color
+		_apply_body_sprite()
 		_update_geometry()
 
 
@@ -52,5 +52,5 @@ func promote_to_player() -> void:
 	GameState.unregister_heir(self)
 	GameState.player_wolf = self
 	body_color = Color(0.55, 0.55, 0.58)
-	_body.color = body_color
+	_apply_body_sprite()
 	_attack_cooldown = 0.0
