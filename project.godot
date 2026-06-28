@@ -27,6 +27,7 @@ GameState="*res://scripts/autoload/game_state.gd"
 EvolutionRegistry="*res://scripts/autoload/evolution_registry.gd"
 LineageSave="*res://scripts/autoload/lineage_save.gd"
 LineageCodex="*res://scripts/autoload/lineage_codex.gd"
+LineageMeta="*res://scripts/autoload/lineage_meta.gd"
 
 [display]
 

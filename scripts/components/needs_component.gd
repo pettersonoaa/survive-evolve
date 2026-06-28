@@ -28,6 +28,7 @@ func _process(delta: float) -> void:
 	if wolf != null:
 		if wolf.get("is_player_controlled"):
 			decay_scale *= GameConstants.PLAYER_NEEDS_DECAY_MULT
+			decay_scale *= LineageMeta.get_needs_decay_mult()
 			var pack_size := GameState.get_pack_size()
 			decay_scale *= 1.0 + float(maxi(pack_size - 1, 0)) * GameConstants.PACK_SIZE_DECAY_SCALE
 			decay_scale *= 1.0 + float(GameState.lineage.generation) * GameConstants.GENERATION_NEEDS_SCALE

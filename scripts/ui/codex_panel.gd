@@ -17,10 +17,20 @@ func open() -> void:
 func refresh() -> void:
 	var discovered := LineageCodex.get_discovered_count()
 	var total := LineageCodex.get_total_count()
-	_summary.text = "Traits discovered: %d / %d" % [discovered, total]
+	_summary.text = "Traits: %d / %d · Meta tier: %s" % [
+		discovered, total, LineageMeta.get_milestone_name(),
+	]
 	var lines: PackedStringArray = []
-	for entry in LineageCodex.get_display_entries():
-		lines.append("• %s" % entry["name"])
+	for section in LineageCodex.get_codex_sections():
+		lines.append("[b]%s[/b]" % section["branch"])
+		for entry in section["entries"]:
+			var label: String = entry["name"]
+			if not entry["discovered"]:
+				label = "???"
+			if entry.get("apex", false) and entry["discovered"]:
+				label += " (apex)"
+			lines.append("  • %s" % label)
+		lines.append("")
 	if lines.is_empty():
 		_list.text = "No traits recorded yet.\nMate and evolve across runs to fill the codex."
 	else:

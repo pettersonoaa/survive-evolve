@@ -25,7 +25,7 @@ You are a wolf building a bloodline in a hostile open map. Survival is immediate
 | Pack | Feed partners + dependent pups together; Pack HUD shows their needs |
 | Growth | Pups age → leave pack → self-sufficient → may turn rogue (hostile, still heirs) |
 | Succession | Die → pick an heir (pup, young wolf, or rogue) → continue lineage |
-| Meta | Lineage Codex remembers traits across New Lineage runs |
+| Meta | Lineage Codex + **LineageMeta** tiers (Scout/Hunter/Alpha bonuses) |
 
 Full rules: `DESIGN_DECISIONS.md`. Implementation tracker: `PROTOTYPE_STATUS.md`.
 

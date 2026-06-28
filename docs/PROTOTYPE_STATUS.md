@@ -39,6 +39,10 @@
 | STEP-40 | yes | 2026-06-26 | `wolf_sheet.png` generated (8-frame idle/walk strip) |
 | STEP-41 | yes | 2026-06-26 | Minimap HUD + pup lifecycle badges (Pup / Young / Rogue) |
 | STEP-42 | yes | 2026-06-26 | Hare prey, `SeasonManager`, `TerritoryManager` (den radius) |
+| STEP-43 | yes | 2026-06-26 | `LineageMeta` — persistent run stats across New Lineage |
+| STEP-44 | yes | 2026-06-26 | Game over / victory meta summary |
+| STEP-45 | yes | 2026-06-26 | Meta milestones (Scout/Hunter/Alpha) — starting bonuses |
+| STEP-46 | yes | 2026-06-26 | Codex v2 — branch sections + hidden traits |
 
 ## Agent review (post-pack estimated)
 
@@ -61,6 +65,7 @@
 9. **Minimap** (bottom-right) shows pack, prey, predators, and territory ring.
 10. Die → heir picker (shows Pup / Young wolf / Rogue) → or game over without heirs.
 11. Apex death with heir → lineage complete; **Lineage Codex** tracks traits across New Lineage runs.
+12. **Meta tier** (Scout/Hunter/Alpha) unlocks small bonuses on future New Lineage runs.
 
 ## Doc authority
 

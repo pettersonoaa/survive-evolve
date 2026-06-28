@@ -64,7 +64,7 @@ survive-evolve/
 
 ## Status
 
-**Playable prototype** through STEP-38: pack feeding, litters, pup lifecycle (pup → independent → rogue), procedural runs, save/load, lineage codex. Authoritative design: `docs/DESIGN_DECISIONS.md`.
+**Playable prototype** through STEP-46: pack feeding, litters, pup lifecycle, procedural runs, save/load, lineage codex, and meta progression tiers.
 
 ## Tests (headless)
 

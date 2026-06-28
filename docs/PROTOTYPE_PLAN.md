@@ -670,6 +670,35 @@ Steps STEP-01–16 (core), STEP-20–31 (content/polish), STEP-32–35 (Phase 3 
 
 ---
 
+## 15. Phase 5 — meta expansion
+
+| ID | Summary |
+|----|---------|
+| STEP-43 | `LineageMeta` autoload — persist runs started/failed/won, best generation (`user://lineage_meta.json`) |
+| STEP-44 | Run summary on game over / victory — meta stats panel |
+| STEP-45 | Meta milestones — Scout (5 traits), Hunter (12), Alpha (20): starting refill + needs decay bonus on New Lineage |
+| STEP-46 | Codex v2 — branch sections (Senses / Mobility / …) with `???` for undiscovered traits |
+
+### STEP-43 VERIFY
+
+1. Play New Lineage twice — main menu shows runs started ≥ 2.
+2. Fail a run — `runs_failed` increments on next game over screen.
+
+### STEP-44 VERIFY
+
+1. Game over or apex victory — meta block shows best generation and run counts.
+
+### STEP-45 VERIFY
+
+1. With ≥5 codex traits, New Lineage toast shows tier bonus refill.
+2. Player needs decay slightly lower at Hunter/Alpha tiers.
+
+### STEP-46 VERIFY
+
+1. Codex panel groups traits by branch; undiscovered show as `???`.
+
+---
+
 ## 11. `PROTOTYPE_STATUS.md` template
 
 Agents append after each step:

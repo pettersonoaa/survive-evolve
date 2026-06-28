@@ -44,6 +44,68 @@ func get_display_entries() -> Array[Dictionary]:
 	return entries
 
 
+const BRANCH_ROOTS := {
+	"keen_nose": "Senses",
+	"long_legs": "Mobility",
+	"thick_hide": "Physique",
+	"lean_body": "Metabolism",
+	"pack_call": "Pack",
+}
+
+const BRANCH_ORDER := ["Senses", "Mobility", "Physique", "Metabolism", "Pack", "Other"]
+
+
+func get_codex_sections() -> Array[Dictionary]:
+	var tree := EvolutionRegistry.get_evolution_tree("wolf")
+	if tree == null:
+		return []
+	var buckets: Dictionary = {}
+	for branch in BRANCH_ORDER:
+		buckets[branch] = []
+
+	for node_id in tree.nodes:
+		var node: EvolutionNode = tree.nodes[node_id]
+		if node_id == "wolf_base":
+			continue
+		var branch := _branch_for_node(tree, node_id)
+		if not buckets.has(branch):
+			buckets[branch] = []
+		buckets[branch].append({
+			"id": node_id,
+			"name": node.display_name,
+			"discovered": node_id in discovered_node_ids,
+			"apex": node.is_apex,
+		})
+
+	var sections: Array[Dictionary] = []
+	for branch in BRANCH_ORDER:
+		if not buckets.has(branch) or buckets[branch].is_empty():
+			continue
+		var entries: Array = buckets[branch]
+		entries.sort_custom(func(a, b): return a["name"] < b["name"])
+		sections.append({"branch": branch, "entries": entries})
+	return sections
+
+
+func _branch_for_node(tree: EvolutionTree, node_id: String) -> String:
+	var current := node_id
+	var guard := 0
+	while current != "wolf_base" and current != "" and guard < 12:
+		if BRANCH_ROOTS.has(current):
+			return BRANCH_ROOTS[current]
+		current = _parent_of(tree, current)
+		guard += 1
+	return "Other"
+
+
+func _parent_of(tree: EvolutionTree, node_id: String) -> String:
+	for parent_id in tree.nodes:
+		var parent: EvolutionNode = tree.nodes[parent_id]
+		if node_id in parent.child_ids:
+			return parent_id
+	return ""
+
+
 func _on_evolution_applied(_parent: Node, node_id: String, _display_name: String) -> void:
 	record_node(node_id)
 

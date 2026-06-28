@@ -22,10 +22,14 @@ func _refresh_subtitle() -> void:
 		LineageCodex.get_discovered_count(),
 		LineageCodex.get_total_count(),
 	]
+	var meta_line := "Meta: %s · best Gen %d" % [
+		LineageMeta.get_milestone_name(),
+		LineageMeta.best_generation,
+	]
 	if LineageSave.has_save():
-		_subtitle.text = "Generation %d saved\n%s" % [_peek_generation(), codex_line]
+		_subtitle.text = "Generation %d saved\n%s\n%s" % [_peek_generation(), codex_line, meta_line]
 	else:
-		_subtitle.text = "No saved lineage\n%s" % codex_line
+		_subtitle.text = "No saved lineage\n%s\n%s" % [codex_line, meta_line]
 
 
 func _on_codex_pressed() -> void:

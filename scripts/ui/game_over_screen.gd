@@ -2,6 +2,7 @@ extends Control
 
 @onready var _title: Label = $Panel/Title
 @onready var _reason: Label = $Panel/Reason
+@onready var _meta: Label = $Panel/Meta
 @onready var _restart: Button = $Panel/RestartButton
 
 var _mode := ""
@@ -25,6 +26,7 @@ func show_game_over(reason: String, cause: String) -> void:
 			]
 		_:
 			_reason.text = "%s\nTraits seen: %s" % [reason, traits]
+	_meta.text = "\n".join(LineageMeta.get_summary_lines())
 
 
 func show_lineage_complete(apex_name: String) -> void:
@@ -35,6 +37,7 @@ func show_lineage_complete(apex_name: String) -> void:
 	_reason.text = "Apex: %s\nGeneration: %d\nTraits seen: %s" % [
 		apex_name, GameState.lineage.generation, traits
 	]
+	_meta.text = "\n".join(LineageMeta.get_summary_lines())
 
 
 func _on_restart_pressed() -> void:

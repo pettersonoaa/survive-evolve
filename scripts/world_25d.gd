@@ -16,9 +16,25 @@ func _ready() -> void:
 
 
 func _setup_new_run() -> void:
+	LineageMeta.record_run_started()
 	_bind_player_wolf()
 	_WorldGenerator.scatter(self, GameState.run_seed)
 	call_deferred("_apply_world_scaling")
+	call_deferred("_apply_meta_bonuses")
+
+
+func _apply_meta_bonuses() -> void:
+	var wolf := GameState.player_wolf
+	if wolf == null or not wolf.has_node("NeedsComponent"):
+		return
+	var needs: NeedsComponent = wolf.get_node("NeedsComponent")
+	var bonus := LineageMeta.get_starting_refill()
+	if bonus > 0.0:
+		needs.eat(bonus)
+		needs.drink(bonus)
+		EventBus.ui_toast.emit("Lineage memory: +%.0f needs (tier %s)" % [
+			bonus, LineageMeta.get_milestone_name()
+		], 2.8)
 
 
 func _load_saved_run() -> void:
