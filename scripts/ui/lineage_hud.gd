@@ -3,6 +3,7 @@ extends Control
 @onready var _gen_label: Label = $Panel/GenLabel
 @onready var _trait_label: Label = $Panel/TraitLabel
 @onready var _heir_label: Label = $Panel/HeirLabel
+@onready var _threat_label: Label = $Panel/ThreatLabel
 @onready var _gestation_label: Label = $Panel/GestationLabel
 
 var _flash_time := 0.0
@@ -22,6 +23,7 @@ func _process(delta: float) -> void:
 		_trait_label.text = "Trait: %s" % wolf.trait_display_name
 		GameState.prune_dead_heirs()
 		_heir_label.text = "Heirs: %d" % GameState.living_heirs.size()
+		_threat_label.text = "Threat: %s" % _threat_tier(GameState.lineage.generation)
 	if GameState.gestation_active:
 		_gestation_label.text = "Gestation: %ds (slow drain)" % int(ceil(GameState.gestation_time_left))
 		_gestation_label.visible = true
@@ -45,3 +47,13 @@ func _on_needs_critical(wolf: Node, need: String) -> void:
 		EventBus.ui_toast.emit("Low hunger — find food!", 2.0)
 	else:
 		EventBus.ui_toast.emit("Low thirst — find water!", 2.0)
+
+
+func _threat_tier(generation: int) -> String:
+	if generation < 2:
+		return "Calm"
+	if generation < 5:
+		return "Tense"
+	if generation < 8:
+		return "Harsh"
+	return "Deadly"

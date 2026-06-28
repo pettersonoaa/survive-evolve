@@ -28,6 +28,7 @@ func _process(delta: float) -> void:
 	if wolf != null:
 		if wolf.get("is_player_controlled"):
 			decay_scale *= GameConstants.PLAYER_NEEDS_DECAY_MULT
+			decay_scale *= 1.0 + float(GameState.lineage.generation) * GameConstants.GENERATION_NEEDS_SCALE
 			if GameState.gestation_active:
 				decay_scale *= 0.35
 		elif wolf.get_script() != null:

@@ -1,5 +1,7 @@
 extends Node2D
 
+const _WorldGenerator = preload("res://scripts/systems/world_generator.gd")
+
 
 func _ready() -> void:
 	add_to_group("world_root")
@@ -9,11 +11,24 @@ func _ready() -> void:
 		call_deferred("_load_saved_run")
 	else:
 		GameState.reset_for_new_run()
-		call_deferred("_bind_player_wolf")
+		GameState.run_seed = randi()
+		call_deferred("_setup_new_run")
+
+
+func _setup_new_run() -> void:
+	_bind_player_wolf()
+	_WorldGenerator.scatter(self, GameState.run_seed)
+	call_deferred("_apply_world_scaling")
 
 
 func _load_saved_run() -> void:
 	LineageSave.load_into_world(self)
+	call_deferred("_apply_world_scaling")
+
+
+func _apply_world_scaling() -> void:
+	for node in get_tree().get_nodes_in_group("difficulty_scaler"):
+		node.call("_apply_scaling")
 
 
 func _bind_player_wolf() -> void:

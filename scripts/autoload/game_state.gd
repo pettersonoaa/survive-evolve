@@ -9,6 +9,7 @@ var gestation_partner: PartnerWolf = null
 var pending_offspring: Dictionary = {}
 var pending_succession_after_gestation: bool = false
 var modal_ui_open: bool = false
+var run_seed: int = 0
 
 
 func reset_for_new_run() -> void:
@@ -21,6 +22,7 @@ func reset_for_new_run() -> void:
 	pending_offspring = {}
 	pending_succession_after_gestation = false
 	modal_ui_open = false
+	run_seed = 0
 
 
 func register_heir(wolf: Node2D) -> void:

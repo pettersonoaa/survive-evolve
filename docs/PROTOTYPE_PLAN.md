@@ -604,6 +604,31 @@ World (world_25d.gd)
 
 ---
 
+## 12. Phase 3 — meta progression & run variety
+
+| ID | Summary |
+|----|---------|
+| STEP-32 | `WorldGenerator` — scatter resources, prey, partners, predators, props on **New Lineage** (seed in `GameState.run_seed`; skip on Continue) |
+| STEP-33 | `LineageCodex` autoload — record traits on evolve / game over; **Lineage Codex** panel on main menu |
+| STEP-34 | `DifficultyScaler` — predator contact damage + chase speed scale with `lineage.generation`; player needs decay scales slightly |
+| STEP-35 | Threat tier label on `LineageHUD` (Calm / Tense / Harsh / Deadly) |
+
+### STEP-32 VERIFY
+
+1. Main menu → **New Lineage** — resource/partner positions differ from default editor layout.
+2. **Continue** after save — world layout unchanged.
+
+### STEP-33 VERIFY
+
+1. Mate once — codex count increases on main menu.
+2. Codex panel lists discovered trait names.
+
+### STEP-34 VERIFY
+
+1. After several generations, predators deal more damage and move faster (observe HUD threat tier + combat).
+
+---
+
 ## 11. `PROTOTYPE_STATUS.md` template
 
 Agents append after each step:

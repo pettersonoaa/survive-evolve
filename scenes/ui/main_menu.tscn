@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://main_menu"]
+[gd_scene load_steps=3 format=3 uid="uid://main_menu"]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://codex_panel" path="res://scenes/ui/codex_panel.tscn" id="2_codex"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -24,9 +25,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -180.0
-offset_top = -90.0
+offset_top = -110.0
 offset_right = 180.0
-offset_bottom = 90.0
+offset_bottom = 110.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 14
@@ -50,9 +51,16 @@ text = "Continue Lineage"
 layout_mode = 2
 text = "New Lineage"
 
+[node name="CodexButton" type="Button" parent="Panel"]
+layout_mode = 2
+text = "Lineage Codex"
+
 [node name="Hint" type="Label" parent="Panel"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.72, 0.68, 1)
 text = "WASD move · E interact · 30s gestation"
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="CodexPanel" parent="." instance=ExtResource("2_codex")]
+layout_mode = 1

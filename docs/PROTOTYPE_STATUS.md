@@ -28,6 +28,10 @@
 | STEP-29 | yes | 2026-06-27 | Food/water respawn after 90s |
 | STEP-30 | yes | 2026-06-27 | Day/night CanvasModulate cycle (180s) |
 | STEP-31 | yes | 2026-06-27 | Pack assist — heirs + gestation partner join bites |
+| STEP-32 | yes | 2026-06-27 | Procedural world scatter on New Lineage (`WorldGenerator`) |
+| STEP-33 | yes | 2026-06-27 | Lineage Codex autoload — traits persist across runs, menu panel |
+| STEP-34 | yes | 2026-06-27 | Generation-scaled predator damage/speed + player needs decay |
+| STEP-35 | yes | 2026-06-27 | Threat tier HUD (Calm → Deadly) |
 
 ## Agent review (post-polish estimated)
 

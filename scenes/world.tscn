@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://world25d"]
+[gd_scene load_steps=28 format=3 uid="uid://world25d"]
 
 [ext_resource type="Script" path="res://scripts/world_25d.gd" id="1_world"]
 [ext_resource type="Script" path="res://scripts/ground_grid.gd" id="2_ground"]
@@ -23,6 +23,7 @@
 [ext_resource type="Script" path="res://scripts/systems/run_manager.gd" id="17_run"]
 [ext_resource type="Script" path="res://scripts/systems/resource_respawn_manager.gd" id="25_respawn"]
 [ext_resource type="Script" path="res://scripts/systems/day_night_cycle.gd" id="26_daynight"]
+[ext_resource type="Script" path="res://scripts/systems/difficulty_scaler.gd" id="27_difficulty"]
 [ext_resource type="PackedScene" uid="uid://toast_layer" path="res://scenes/ui/toast_layer.tscn" id="18_toast"]
 [ext_resource type="PackedScene" uid="uid://interact_hint" path="res://scenes/ui/interact_hint.tscn" id="19_interact"]
 [ext_resource type="PackedScene" uid="uid://onboarding_hint" path="res://scenes/ui/onboarding_hint.tscn" id="20_onboard"]
@@ -191,6 +192,9 @@ script = ExtResource("17_run")
 
 [node name="ResourceRespawnManager" type="Node" parent="."]
 script = ExtResource("25_respawn")
+
+[node name="DifficultyScaler" type="Node" parent="."]
+script = ExtResource("27_difficulty")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
