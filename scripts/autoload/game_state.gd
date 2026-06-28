@@ -7,6 +7,7 @@ var active_gestations: Array = []
 var pending_succession_after_gestation: bool = false
 var modal_ui_open: bool = false
 var run_seed: int = 0
+var current_season: String = "spring"
 
 
 var gestation_active: bool:
@@ -63,6 +64,7 @@ func reset_for_new_run() -> void:
 	pending_succession_after_gestation = false
 	modal_ui_open = false
 	run_seed = 0
+	current_season = "spring"
 
 
 func register_heir(wolf: Node2D) -> void:

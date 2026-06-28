@@ -3,6 +3,7 @@ extends RefCounted
 
 const SCATTER_RADIUS := 1500.0
 const _PredatorScene := preload("res://scenes/creatures/predator_wolf.tscn")
+const _HareScene := preload("res://scenes/creatures/hare_prey.tscn")
 
 
 static func scatter(world: Node2D, seed_val: int) -> void:
@@ -13,6 +14,7 @@ static func scatter(world: Node2D, seed_val: int) -> void:
 		return
 
 	ensure_predators(world, seed_val)
+	ensure_hares(world, seed_val)
 
 	for child in ysort.get_children():
 		if child is FoodCarcass:
@@ -56,6 +58,33 @@ static func ensure_predators(world: Node2D, seed_val: int) -> void:
 		predator.name = _predator_name(name_index)
 		ysort.add_child(predator)
 		predator.global_position = _random_point(rng, 320.0)
+		living += 1
+
+
+static func ensure_hares(world: Node2D, seed_val: int) -> void:
+	var ysort := world.get_node_or_null("WorldContent/YSort") as Node2D
+	if ysort == null:
+		return
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val ^ 0x48A3
+	var living := 0
+	var name_index := 0
+	for child in ysort.get_children():
+		if child is PreyAnimal and (child as PreyAnimal).prey_kind == PreyAnimal.PreyKind.HARE:
+			living += 1
+			if child.name.begins_with("Hare"):
+				var suffix := child.name.trim_prefix("Hare")
+				if suffix.is_valid_int():
+					name_index = maxi(name_index, int(suffix))
+
+	var target := 5
+	while living < target:
+		name_index += 1
+		var hare := _HareScene.instantiate() as PreyAnimal
+		hare.name = "Hare%d" % name_index
+		ysort.add_child(hare)
+		hare.global_position = _random_point(rng, 80.0)
 		living += 1
 
 

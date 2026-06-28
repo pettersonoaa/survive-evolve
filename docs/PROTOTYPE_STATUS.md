@@ -35,6 +35,10 @@
 | STEP-36 | yes | 2026-06-28 | Pack survival: shared feeding, PackHUD, multi-gestation |
 | STEP-37 | yes | 2026-06-28 | Litters 1–3 per gestation; birth beside mother |
 | STEP-38 | yes | 2026-06-28 | Pup lifecycle: grow → independent → rogue heir |
+| STEP-39 | yes | 2026-06-26 | Balance pass — `docs/BALANCE.md`, tuned `GameConstants` |
+| STEP-40 | yes | 2026-06-26 | `wolf_sheet.png` generated (8-frame idle/walk strip) |
+| STEP-41 | yes | 2026-06-26 | Minimap HUD + pup lifecycle badges (Pup / Young / Rogue) |
+| STEP-42 | yes | 2026-06-26 | Hare prey, `SeasonManager`, `TerritoryManager` (den radius) |
 
 ## Agent review (post-pack estimated)
 
@@ -47,15 +51,16 @@
 ## Playtest loop
 
 1. **Main menu** — Continue saved lineage or New Lineage (procedural scatter).
-2. **WASD** — move; **E** — eat, drink, hunt deer, bite predators/rogue heirs, mate.
+2. **WASD** — move; **E** — eat, drink, hunt deer/hares, bite predators/rogue heirs, mate.
 3. Find partners (forest / plains / tundra / desert blood) — mate with several in parallel (one gestation per partner).
 4. **30s gestation** → **1–3 pups** born beside the mother; trait + bloodline color applied.
 5. **Feed the pack** — E at food/water refills you + partners + **dependent pups** (Pack HUD).
-6. **~50s** — pups grow and leave the pack; hunt alone (still genetic heirs).
-7. **~70s later** — independent pups may turn **rogue** and attack; still selectable as heirs on death.
-8. Den protects dependent pups; predators scale with generation and pack size.
-9. Die → heir picker (shows Pup / Young wolf / Rogue) → or game over without heirs.
-10. Apex death with heir → lineage complete; **Lineage Codex** tracks traits across New Lineage runs.
+6. **~60s** — pups grow and leave the pack; hunt alone (still genetic heirs).
+7. **~90s later** — independent pups may turn **rogue** and attack; still selectable as heirs on death.
+8. Den + **territory** (320px) eases needs and slows predators; **seasons** cycle every 120s.
+9. **Minimap** (bottom-right) shows pack, prey, predators, and territory ring.
+10. Die → heir picker (shows Pup / Young wolf / Rogue) → or game over without heirs.
+11. Apex death with heir → lineage complete; **Lineage Codex** tracks traits across New Lineage runs.
 
 ## Doc authority
 

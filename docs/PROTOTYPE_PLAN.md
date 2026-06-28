@@ -621,7 +621,7 @@ Steps STEP-01–16 (core), STEP-20–31 (content/polish), STEP-32–35 (Phase 3 
 |----|---------|
 | STEP-36 | `PackNeedsManager` + `PackHUD` — shared feeding for player + partners + **dependent pups**; pack-size difficulty scaling |
 | STEP-37 | Litters **1–3** per gestation; siblings share trait; spawn cluster beside mother |
-| STEP-38 | `SonWolf` lifecycle: **Pup** (50s) → **Young wolf** (independent, self-feeds) → **Rogue** (+70s, hostile, still genetic heir) |
+| STEP-38 | `SonWolf` lifecycle: **Pup** (60s) → **Young wolf** (independent, self-feeds) → **Rogue** (+90s, hostile, still genetic heir) |
 
 ### STEP-36 VERIFY
 
@@ -635,8 +635,38 @@ Steps STEP-01–16 (core), STEP-20–31 (content/polish), STEP-32–35 (Phase 3 
 
 ### STEP-38 VERIFY
 
-1. Wait ~50s after birth — toast: pup left the pack; removed from Pack HUD.
-2. Wait ~70s more — rogue toast; pup attacks; still appears in heir picker on death.
+1. Wait ~60s after birth — toast: pup left the pack; removed from Pack HUD.
+2. Wait ~90s more — rogue toast; pup attacks; still appears in heir picker on death.
+
+---
+
+## 14. Phase 4b — polish before meta expansion
+
+| ID | Summary |
+|----|---------|
+| STEP-39 | Balance pass — `docs/BALANCE.md`, tuned predator counts, needs decay, lifecycle timers |
+| STEP-40 | `assets/sprites/wolf/wolf_sheet.png` — 8-frame strip via `generate_wolf_sheet.gd` |
+| STEP-41 | `Minimap` HUD (entities + territory ring) + pup lifecycle badges on `SonWolf` |
+| STEP-42 | Hare prey type, `SeasonManager` (120s cycle), `TerritoryManager` (den radius 320px) |
+
+### STEP-39 VERIFY
+
+1. New lineage — fewer early predators (base 5); pack growth raises pressure gradually.
+2. Winter season toast — needs drain faster than spring.
+
+### STEP-40 VERIFY
+
+1. `wolf_sheet.png` exists; wolves use sheet atlas (not single-frame procedural).
+
+### STEP-41 VERIFY
+
+1. Minimap bottom-right shows player, partners, pups, prey, predators.
+2. Pups display **Pup** / **Young** / **Rogue** label above sprite.
+
+### STEP-42 VERIFY
+
+1. Hunt hares — faster, smaller, less food than deer.
+2. Stand near den — needs decay slower; predators chase slower inside territory ring.
 
 ---
 

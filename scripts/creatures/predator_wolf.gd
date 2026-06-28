@@ -36,7 +36,12 @@ func _process(delta: float) -> void:
 	var dist := offset.length()
 	if dist < GameConstants.PREDATOR_AGGRO_RANGE and dist > 28.0:
 		_last_move_dir = offset.normalized()
-		global_position += offset.normalized() * stats.move_speed * chase_speed_mult * delta
+		var speed_mult := chase_speed_mult
+		var territory := get_tree().get_first_node_in_group("territory_manager")
+		if territory != null and territory.has_method("is_in_territory"):
+			if territory.is_in_territory(global_position):
+				speed_mult *= GameConstants.TERRITORY_PREDATOR_SPEED_MULT
+		global_position += offset.normalized() * stats.move_speed * speed_mult * delta
 	elif dist <= 28.0 and _cooldown <= 0.0:
 		_last_move_dir = Vector2.ZERO
 		target.take_damage(contact_damage, "predator")

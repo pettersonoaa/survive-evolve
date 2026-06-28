@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://world25d"]
+[gd_scene load_steps=33 format=3 uid="uid://world25d"]
 
 [ext_resource type="Script" path="res://scripts/world_25d.gd" id="1_world"]
 [ext_resource type="Script" path="res://scripts/ground_grid.gd" id="2_ground"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://water_source" path="res://scenes/resources/water_source.tscn" id="9_water"]
 [ext_resource type="PackedScene" uid="uid://food_carcass" path="res://scenes/resources/food_carcass.tscn" id="10_food"]
 [ext_resource type="PackedScene" uid="uid://prey_animal_scene" path="res://scenes/creatures/prey_animal.tscn" id="22_prey"]
+[ext_resource type="PackedScene" uid="uid://hare_prey_scene" path="res://scenes/creatures/hare_prey.tscn" id="30_hare"]
 [ext_resource type="PackedScene" uid="uid://wolf_den" path="res://scenes/resources/wolf_den.tscn" id="23_den"]
 [ext_resource type="PackedScene" uid="uid://biome_zone" path="res://scenes/world/biome_zone.tscn" id="24_biome"]
 [ext_resource type="PackedScene" uid="uid://needs_hud" path="res://scenes/ui/needs_hud.tscn" id="11_needs"]
@@ -29,6 +30,9 @@
 [ext_resource type="PackedScene" uid="uid://toast_layer" path="res://scenes/ui/toast_layer.tscn" id="18_toast"]
 [ext_resource type="PackedScene" uid="uid://interact_hint" path="res://scenes/ui/interact_hint.tscn" id="19_interact"]
 [ext_resource type="PackedScene" uid="uid://onboarding_hint" path="res://scenes/ui/onboarding_hint.tscn" id="20_onboard"]
+[ext_resource type="Script" path="res://scripts/systems/season_manager.gd" id="31_season"]
+[ext_resource type="Script" path="res://scripts/systems/territory_manager.gd" id="32_territory"]
+[ext_resource type="PackedScene" uid="uid://minimap_hud" path="res://scenes/ui/minimap.tscn" id="33_minimap"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_world")
@@ -108,6 +112,15 @@ position = Vector2(-400, 40)
 
 [node name="DeerD" parent="WorldContent/YSort" instance=ExtResource("22_prey")]
 position = Vector2(380, -120)
+
+[node name="HareA" parent="WorldContent/YSort" instance=ExtResource("30_hare")]
+position = Vector2(60, 40)
+
+[node name="HareB" parent="WorldContent/YSort" instance=ExtResource("30_hare")]
+position = Vector2(-240, -60)
+
+[node name="HareC" parent="WorldContent/YSort" instance=ExtResource("30_hare")]
+position = Vector2(440, 80)
 
 [node name="WaterA" parent="WorldContent/YSort" instance=ExtResource("9_water")]
 position = Vector2(120, -120)
@@ -201,6 +214,12 @@ script = ExtResource("27_difficulty")
 [node name="PackNeedsManager" type="Node" parent="."]
 script = ExtResource("28_pack_needs")
 
+[node name="SeasonManager" type="Node" parent="."]
+script = ExtResource("31_season")
+
+[node name="TerritoryManager" type="Node" parent="."]
+script = ExtResource("32_territory")
+
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="OnboardingHint" parent="UI" instance=ExtResource("20_onboard")]
@@ -212,6 +231,8 @@ script = ExtResource("28_pack_needs")
 [node name="PackHUD" parent="UI" instance=ExtResource("29_pack_hud")]
 
 [node name="LineageHUD" parent="UI" instance=ExtResource("12_lineage")]
+
+[node name="Minimap" parent="UI" instance=ExtResource("33_minimap")]
 
 [node name="GameOverScreen" parent="UI" instance=ExtResource("13_over")]
 

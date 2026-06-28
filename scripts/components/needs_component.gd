@@ -46,6 +46,16 @@ func _process(delta: float) -> void:
 			elif son.life_stage == SonWolf.LifeStage.ROGUE:
 				decay_scale *= 0.75
 
+	var tree := wolf.get_tree() if wolf != null else null
+	if tree != null:
+		var season_mgr := tree.get_first_node_in_group("season_manager")
+		if season_mgr != null and season_mgr.has_method("get_needs_mult"):
+			decay_scale *= season_mgr.get_needs_mult()
+		var territory := tree.get_first_node_in_group("territory_manager")
+		if territory != null and territory.has_method("is_in_territory") and wolf is Node2D:
+			if territory.is_in_territory((wolf as Node2D).global_position):
+				decay_scale *= GameConstants.TERRITORY_NEEDS_MULT
+
 	hunger = maxf(hunger - hunger_decay_per_sec * metabolism * hunger_mult * decay_scale * delta, 0.0)
 	thirst = maxf(thirst - thirst_decay_per_sec * metabolism * thirst_mult * decay_scale * delta, 0.0)
 

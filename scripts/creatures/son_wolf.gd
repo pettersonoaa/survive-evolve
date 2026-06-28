@@ -15,6 +15,7 @@ var _wander_dir := Vector2.RIGHT
 var _wander_timer := 0.0
 var _rogue_attack_cooldown := 0.0
 var _independent_age_seconds := 0.0
+var _stage_badge: Label = null
 
 
 func _ready() -> void:
@@ -28,6 +29,12 @@ func _ready() -> void:
 	add_to_group("pack_member")
 	_wander_timer = randf_range(2.0, 4.0)
 	EventBus.pack_assist_requested.connect(_on_pack_assist_requested)
+	_stage_badge = Label.new()
+	_stage_badge.add_theme_font_size_override("font_size", 9)
+	_stage_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_stage_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_visual.add_child(_stage_badge)
+	_update_stage_badge()
 
 
 func setup_from_birth(birth_stats: WolfStats, node_id: String, partner_genes: WolfGenes) -> void:
@@ -89,6 +96,7 @@ func _process(delta: float) -> void:
 	super._process(delta)
 	if life_stage == LifeStage.PUP:
 		_apply_growth_visual()
+	_update_stage_badge()
 
 
 func _check_lifecycle_transitions() -> void:
@@ -135,6 +143,25 @@ func _set_life_stage(stage: LifeStage, emit_signal: bool) -> void:
 			add_to_group("rogue_heir")
 	if emit_signal:
 		EventBus.heir_lifecycle_changed.emit(self, get_life_stage_label())
+	_update_stage_badge()
+
+
+func _update_stage_badge() -> void:
+	if _stage_badge == null:
+		return
+	match life_stage:
+		LifeStage.PUP:
+			_stage_badge.text = "Pup"
+			_stage_badge.modulate = Color(0.78, 0.9, 0.55)
+		LifeStage.INDEPENDENT:
+			_stage_badge.text = "Young"
+			_stage_badge.modulate = Color(0.75, 0.78, 0.88)
+		LifeStage.ROGUE:
+			_stage_badge.text = "Rogue"
+			_stage_badge.modulate = Color(0.95, 0.4, 0.35)
+		_:
+			_stage_badge.text = ""
+	_stage_badge.position = Vector2(-body_size.x * 0.35, -body_size.y - 14.0)
 
 
 func _apply_growth_visual() -> void:
