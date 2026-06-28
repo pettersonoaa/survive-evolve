@@ -1,7 +1,5 @@
 extends Node
 
-const GESTATION_SECONDS := 60.0
-
 @onready var _y_sort: Node2D = $"../WorldContent/YSort"
 @onready var _son_scene: PackedScene = preload("res://scenes/creatures/son_wolf.tscn")
 
@@ -41,27 +39,41 @@ func try_mate(player, partner: PartnerWolf) -> bool:
 		"parent": player,
 	}
 	GameState.gestation_active = true
-	GameState.gestation_time_left = GESTATION_SECONDS
+	GameState.gestation_time_left = GameConstants.GESTATION_SECONDS
 	GameState.gestation_partner = partner
 	GameState.lineage.record_trait(trait_name)
 	EventBus.mate_started.emit(player, partner)
 	EventBus.evolution_applied.emit(player, child_node_id, trait_name)
-	EventBus.ui_toast.emit("Mating — trait rolled: %s (60s gestation)" % trait_name, 3.0)
+	EventBus.ui_toast.emit(
+		"Mating — trait rolled: %s (%ds gestation)" % [trait_name, int(GameConstants.GESTATION_SECONDS)],
+		3.0
+	)
 	return true
 
 
 func _finish_gestation() -> void:
+	if not GameState.gestation_active:
+		return
 	GameState.gestation_active = false
+	GameState.gestation_time_left = 0.0
 	GameState.gestation_partner = null
 	var data: Dictionary = GameState.pending_offspring
 	if data.is_empty():
 		return
 
-	var parent = data["parent"]
-	var partner: PartnerWolf = data["partner"]
+	var parent = data.get("parent")
+	if not is_instance_valid(parent):
+		parent = GameState.player_wolf
+	var partner = data.get("partner")
 	var son: SonWolf = _son_scene.instantiate() as SonWolf
 	_y_sort.add_child(son)
-	son.global_position = parent.global_position + Vector2(24, 8)
+	var spawn_pos := Vector2.ZERO
+	var den: Node2D = InteractUtils.find_den(get_tree())
+	if den != null and den.has_method("get_spawn_position"):
+		spawn_pos = den.get_spawn_position()
+	elif parent is Node2D and is_instance_valid(parent):
+		spawn_pos = (parent as Node2D).global_position + Vector2(24, 8)
+	son.global_position = spawn_pos
 	son.setup_from_birth(data["stats"], data["node_id"], data["partner_genes"])
 
 	GameState.lineage.generation += 1
@@ -71,14 +83,17 @@ func _finish_gestation() -> void:
 	var partner_tag := ""
 	if data["partner_genes"] is WolfGenes:
 		partner_tag = data["partner_genes"].display_tag
-	EventBus.ui_toast.emit("Son born: %s (%s)" % [son.trait_display_name, partner_tag], 3.0)
+	EventBus.ui_toast.emit("Son born at den: %s (%s)" % [son.trait_display_name, partner_tag], 3.0)
 	EventBus.mate_completed.emit(parent, partner, son)
 
 	if GameState.pending_succession_after_gestation:
 		GameState.pending_succession_after_gestation = false
 		var run_manager := get_tree().get_first_node_in_group("run_manager")
-		if run_manager != null and is_instance_valid(parent) and parent.is_dead:
-			run_manager.promote_heir(son, parent)
+		var succession_parent = data.get("parent")
+		if not is_instance_valid(succession_parent):
+			succession_parent = parent
+		if run_manager != null and is_instance_valid(succession_parent) and succession_parent.is_dead:
+			run_manager.promote_heir(son, succession_parent)
 
 
 func force_mate_debug() -> void:

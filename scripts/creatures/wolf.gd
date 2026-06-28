@@ -68,8 +68,8 @@ func _try_nearest_interact() -> void:
 		else:
 			EventBus.ui_toast.emit("Nothing to interact with nearby", 1.5)
 		return
-	if target is PredatorWolf:
-		if _try_attack(target as PredatorWolf):
+	if target.is_in_group("predator_wolf") or target.is_in_group("prey_animal"):
+		if _try_attack(target):
 			return
 		EventBus.ui_toast.emit("Attack on cooldown — wait a moment", 1.2)
 		return
@@ -78,12 +78,14 @@ func _try_nearest_interact() -> void:
 	_fail_message_for(target)
 
 
-func _try_attack(predator: PredatorWolf) -> bool:
-	if _attack_cooldown > 0.0 or predator.is_dead:
+func _try_attack(target: Node) -> bool:
+	if _attack_cooldown > 0.0 or not target.has_method("receive_bite"):
 		return false
-	if not InteractUtils.is_in_interact_range(self, predator):
+	if target.get("is_dead"):
 		return false
-	predator.receive_bite(self)
+	if not InteractUtils.is_in_interact_range(self, target):
+		return false
+	target.receive_bite(self)
 	_attack_cooldown = GameConstants.ATTACK_COOLDOWN
 	return true
 
@@ -93,6 +95,11 @@ func _has_approach_target() -> bool:
 		if node is PredatorWolf and not (node as PredatorWolf).is_dead:
 			if InteractUtils.is_in_approach_range(self, node):
 				return true
+	for node in get_tree().get_nodes_in_group("prey_animal"):
+		if node.get("is_dead"):
+			continue
+		if InteractUtils.is_in_approach_range(self, node):
+			return true
 	for node in get_tree().get_nodes_in_group("partner_wolf"):
 		if node is PartnerWolf and not (node as PartnerWolf).is_dead:
 			if InteractUtils.is_in_mate_range(self, node):
@@ -124,6 +131,18 @@ func _pick_interact_target() -> Node:
 			best_predator = predator
 	if best_predator != null:
 		return best_predator
+
+	var best_prey: Node = null
+	var best_prey_dist := GameConstants.INTERACT_RANGE + 1.0
+	for node in get_tree().get_nodes_in_group("prey_animal"):
+		if node.get("is_dead"):
+			continue
+		var dist := InteractUtils.distance_to(self, node)
+		if dist <= GameConstants.INTERACT_RANGE and dist < best_prey_dist:
+			best_prey_dist = dist
+			best_prey = node
+	if best_prey != null:
+		return best_prey
 
 	var best_partner: PartnerWolf = null
 	var best_partner_dist := GameConstants.MATE_RANGE + 1.0

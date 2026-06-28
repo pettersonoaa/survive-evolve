@@ -72,12 +72,16 @@ func _gather_targets() -> Array[Wolf]:
 	var targets: Array[Wolf] = []
 	if GameState.player_wolf is Wolf and is_instance_valid(GameState.player_wolf):
 		var player := GameState.player_wolf as Wolf
-		if not player.is_dead:
+		if not player.is_dead and not _is_protected(player):
 			targets.append(player)
 	for heir in GameState.get_living_heirs():
-		if heir is Wolf and is_instance_valid(heir) and not heir.is_dead:
+		if heir is Wolf and is_instance_valid(heir) and not heir.is_dead and not _is_protected(heir as Wolf):
 			targets.append(heir as Wolf)
 	for node in get_tree().get_nodes_in_group("partner_wolf"):
-		if node is PartnerWolf and is_instance_valid(node) and not node.is_dead:
+		if node is PartnerWolf and is_instance_valid(node) and not node.is_dead and not _is_protected(node as Wolf):
 			targets.append(node as Wolf)
 	return targets
+
+
+func _is_protected(wolf: Wolf) -> bool:
+	return InteractUtils.den_covers(get_tree(), wolf.global_position)

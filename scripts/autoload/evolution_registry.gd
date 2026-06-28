@@ -29,6 +29,15 @@ const PARTNER_PRESETS := {
 		},
 		"stat_bias": {"max_health": 1.1, "hunger_decay": 0.88, "thirst_decay": 0.92},
 	},
+	"desert_wolf": {
+		"tag": "Desert blood",
+		"color": Color(0.72, 0.58, 0.38),
+		"branch_weights": {
+			"ambush_predator": 2.2, "silent_stalker": 2.0, "trail_runner": 1.8, "iron_gut": 1.6,
+			"fast_metabolism": 1.4, "keen_nose": 1.2, "winter_coat": 0.3, "thick_hide": 0.5,
+		},
+		"stat_bias": {"thirst_decay": 0.85, "bite_damage": 1.08, "move_speed": 1.05},
+	},
 }
 
 var _trees: Dictionary = {}

@@ -28,3 +28,16 @@ static func is_in_approach_range(player: Node2D, target: Node2D) -> bool:
 
 static func is_in_mate_range(player: Node2D, target: Node2D) -> bool:
 	return distance_to(player, target) <= GameConstants.MATE_RANGE
+
+
+static func find_den(tree: SceneTree) -> Node2D:
+	for node in tree.get_nodes_in_group("wolf_den"):
+		return node as Node2D
+	return null
+
+
+static func den_covers(tree: SceneTree, global_pos: Vector2) -> bool:
+	for node in tree.get_nodes_in_group("wolf_den"):
+		if node.has_method("contains_point") and node.contains_point(global_pos):
+			return true
+	return false

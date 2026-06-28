@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://world25d"]
+[gd_scene load_steps=25 format=3 uid="uid://world25d"]
 
 [ext_resource type="Script" path="res://scripts/world_25d.gd" id="1_world"]
 [ext_resource type="Script" path="res://scripts/ground_grid.gd" id="2_ground"]
@@ -11,6 +11,9 @@
 [ext_resource type="PackedScene" uid="uid://predator_wolf_scene" path="res://scenes/creatures/predator_wolf.tscn" id="8_pred"]
 [ext_resource type="PackedScene" uid="uid://water_source" path="res://scenes/resources/water_source.tscn" id="9_water"]
 [ext_resource type="PackedScene" uid="uid://food_carcass" path="res://scenes/resources/food_carcass.tscn" id="10_food"]
+[ext_resource type="PackedScene" uid="uid://prey_animal_scene" path="res://scenes/creatures/prey_animal.tscn" id="22_prey"]
+[ext_resource type="PackedScene" uid="uid://wolf_den" path="res://scenes/resources/wolf_den.tscn" id="23_den"]
+[ext_resource type="PackedScene" uid="uid://biome_zone" path="res://scenes/world/biome_zone.tscn" id="24_biome"]
 [ext_resource type="PackedScene" uid="uid://needs_hud" path="res://scenes/ui/needs_hud.tscn" id="11_needs"]
 [ext_resource type="PackedScene" uid="uid://lineage_hud" path="res://scenes/ui/lineage_hud.tscn" id="12_lineage"]
 [ext_resource type="PackedScene" uid="uid://game_over_screen" path="res://scenes/ui/game_over_screen.tscn" id="13_over"]
@@ -32,10 +35,37 @@ script = ExtResource("21_world_content")
 z_index = -100
 script = ExtResource("2_ground")
 
+[node name="TundraBiome" parent="WorldContent" instance=ExtResource("24_biome")]
+position = Vector2(0, -420)
+biome_id = "tundra"
+display_name = "Tundra"
+zone_radius = 300.0
+
+[node name="Tint" parent="WorldContent/TundraBiome" index="0"]
+color = Color(0.55, 0.62, 0.72, 0.14)
+
+[node name="Label" parent="WorldContent/TundraBiome" index="1"]
+text = "Tundra"
+
+[node name="DesertBiome" parent="WorldContent" instance=ExtResource("24_biome")]
+position = Vector2(-520, -280)
+biome_id = "desert"
+display_name = "Desert"
+zone_radius = 260.0
+
+[node name="Tint" parent="WorldContent/DesertBiome" index="0"]
+color = Color(0.78, 0.62, 0.32, 0.16)
+
+[node name="Label" parent="WorldContent/DesertBiome" index="1"]
+text = "Desert"
+
 [node name="YSort" type="Node2D" parent="WorldContent"]
 y_sort_enabled = true
 
 [node name="PlayerWolf" parent="WorldContent/YSort" instance=ExtResource("3_player")]
+
+[node name="WolfDen" parent="WorldContent/YSort" instance=ExtResource("23_den")]
+position = Vector2(-140, 70)
 
 [node name="ForestPartner" parent="WorldContent/YSort" instance=ExtResource("7_partner")]
 position = Vector2(320, -180)
@@ -46,14 +76,30 @@ position = Vector2(-420, 220)
 archetype_id = "plains_wolf"
 
 [node name="TundraPartner" parent="WorldContent/YSort" instance=ExtResource("7_partner")]
-position = Vector2(180, 480)
+position = Vector2(40, -380)
 archetype_id = "tundra_wolf"
+
+[node name="DesertPartner" parent="WorldContent/YSort" instance=ExtResource("7_partner")]
+position = Vector2(-520, -280)
+archetype_id = "desert_wolf"
 
 [node name="PredatorA" parent="WorldContent/YSort" instance=ExtResource("8_pred")]
 position = Vector2(-280, -320)
 
 [node name="PredatorB" parent="WorldContent/YSort" instance=ExtResource("8_pred")]
 position = Vector2(520, 360)
+
+[node name="DeerA" parent="WorldContent/YSort" instance=ExtResource("22_prey")]
+position = Vector2(-80, -40)
+
+[node name="DeerB" parent="WorldContent/YSort" instance=ExtResource("22_prey")]
+position = Vector2(200, 140)
+
+[node name="DeerC" parent="WorldContent/YSort" instance=ExtResource("22_prey")]
+position = Vector2(-400, 40)
+
+[node name="DeerD" parent="WorldContent/YSort" instance=ExtResource("22_prey")]
+position = Vector2(380, -120)
 
 [node name="WaterA" parent="WorldContent/YSort" instance=ExtResource("9_water")]
 position = Vector2(120, -120)

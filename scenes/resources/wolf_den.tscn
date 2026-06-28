@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3 uid="uid://wolf_den"]
+
+[ext_resource type="Script" path="res://scripts/resources/world/wolf_den.gd" id="1_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_den"]
+radius = 90.0
+
+[node name="WolfDen" type="Area2D"]
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_den")
+
+[node name="Zone" type="Polygon2D" parent="."]
+modulate = Color(0.35, 0.55, 0.32, 0.18)
+polygon = PackedVector2Array(-90, 0, -64, -64, 0, -90, 64, -64, 90, 0, 64, 64, 0, 90, -64, 64)
+
+[node name="Cave" type="Polygon2D" parent="."]
+color = Color(0.28, 0.22, 0.18, 0.95)
+polygon = PackedVector2Array(-36, 8, -28, -20, 0, -32, 28, -20, 36, 8, 24, 20, -24, 20)
+
+[node name="Label" type="Label" parent="."]
+offset_left = -28.0
+offset_top = -52.0
+offset_right = 28.0
+offset_bottom = -36.0
+theme_override_colors/font_color = Color(0.82, 0.78, 0.68, 1)
+text = "Den"
+horizontal_alignment = 1

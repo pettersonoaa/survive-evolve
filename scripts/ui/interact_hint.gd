@@ -24,6 +24,15 @@ func _process(_delta: float) -> void:
 		best_dist = dist
 		best_text = "[E] Bite predator"
 
+	for node in get_tree().get_nodes_in_group("prey_animal"):
+		if node.get("is_dead"):
+			continue
+		var dist := InteractUtils.distance_to(wolf, node)
+		if dist > GameConstants.INTERACT_RANGE or dist >= best_dist:
+			continue
+		best_dist = dist
+		best_text = "[E] Hunt deer"
+
 	for node in get_tree().get_nodes_in_group("partner_wolf"):
 		if not node is PartnerWolf:
 			continue

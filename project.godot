@@ -25,6 +25,7 @@ config/icon="res://icon.svg"
 EventBus="*res://scripts/autoload/event_bus.gd"
 GameState="*res://scripts/autoload/game_state.gd"
 EvolutionRegistry="*res://scripts/autoload/evolution_registry.gd"
+LineageSave="*res://scripts/autoload/lineage_save.gd"
 
 [display]
 

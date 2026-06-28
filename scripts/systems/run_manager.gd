@@ -70,6 +70,8 @@ func _end_run_win(apex_name: String) -> void:
 func promote_heir(heir: SonWolf, from_wolf) -> void:
 	get_tree().paused = false
 	GameState.modal_ui_open = false
+	if GameState.gestation_active and not GameState.pending_offspring.is_empty():
+		GameState.pending_offspring["parent"] = heir
 	heir.promote_to_player()
 	if is_instance_valid(from_wolf):
 		from_wolf.queue_free()

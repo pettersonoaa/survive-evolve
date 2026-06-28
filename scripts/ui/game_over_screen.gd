@@ -39,4 +39,5 @@ func show_lineage_complete(apex_name: String) -> void:
 
 func _on_restart_pressed() -> void:
 	get_tree().paused = false
+	LineageSave.mark_new_run()
 	get_tree().reload_current_scene()

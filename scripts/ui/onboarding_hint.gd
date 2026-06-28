@@ -42,6 +42,6 @@ func _update_text() -> void:
 		1:
 			_label.text = "Find a partner (blood tag). Both need >50% needs. Press E to mate."
 		2:
-			_label.text = "Gestation 60s — partner stays close. Protect them!"
+			_label.text = "Gestation %ds — partner stays close. Protect them!" % int(GameConstants.GESTATION_SECONDS)
 		3:
 			_label.text = "Choose an heir to continue your lineage."

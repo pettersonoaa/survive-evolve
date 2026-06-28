@@ -33,6 +33,11 @@ func _follow_as_heir(delta: float) -> void:
 		_follow_target = GameState.player_wolf
 	if _follow_target == null:
 		return
+	var den: Node2D = InteractUtils.find_den(get_tree())
+	if den != null and den.has_method("contains_wolf") and den.contains_wolf(self):
+		var dist_to_parent := global_position.distance_to(_follow_target.global_position)
+		if dist_to_parent > GameConstants.DEN_STAY_RANGE:
+			return
 	var offset := _follow_target.global_position - global_position
 	if offset.length() > _follow_distance:
 		global_position += offset.normalized() * stats.move_speed * 0.65 * delta
