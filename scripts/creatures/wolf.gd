@@ -10,6 +10,7 @@ class_name Wolf
 var health: float = 100.0
 var is_dead: bool = false
 var partner_genes_at_birth: WolfGenes = null
+var _attack_cooldown := 0.0
 
 @onready var needs: NeedsComponent = $NeedsComponent
 
@@ -28,9 +29,17 @@ func _process(delta: float) -> void:
 	if is_dead:
 		return
 	super._process(delta)
+	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	if is_player_controlled:
 		_handle_movement(delta)
+		global_position = Vector2.ZERO
+	elif is_heir:
+		_follow_as_heir(delta)
 	_apply_needs_damage(delta)
+
+
+func _follow_as_heir(_delta: float) -> void:
+	pass
 
 
 func _handle_movement(delta: float) -> void:
@@ -40,9 +49,146 @@ func _handle_movement(delta: float) -> void:
 	var world_content := get_tree().get_first_node_in_group("world_content") as Node2D
 	if world_content != null:
 		world_content.position -= direction.normalized() * stats.move_speed * delta
-		global_position = Vector2.ZERO
 	else:
 		global_position += direction.normalized() * stats.move_speed * delta
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not is_player_controlled or is_dead or GameState.modal_ui_open:
+		return
+	if event.is_action_pressed("interact"):
+		_try_nearest_interact()
+
+
+func _try_nearest_interact() -> void:
+	var target := _pick_interact_target()
+	if target == null:
+		if _has_approach_target():
+			EventBus.ui_toast.emit("Get closer to interact", 1.5)
+		else:
+			EventBus.ui_toast.emit("Nothing to interact with nearby", 1.5)
+		return
+	if target is PredatorWolf:
+		if _try_attack(target as PredatorWolf):
+			return
+		EventBus.ui_toast.emit("Attack on cooldown — wait a moment", 1.2)
+		return
+	if target.has_method("handle_interact") and target.handle_interact(self):
+		return
+	_fail_message_for(target)
+
+
+func _try_attack(predator: PredatorWolf) -> bool:
+	if _attack_cooldown > 0.0 or predator.is_dead:
+		return false
+	if not InteractUtils.is_in_interact_range(self, predator):
+		return false
+	predator.receive_bite(self)
+	_attack_cooldown = GameConstants.ATTACK_COOLDOWN
+	return true
+
+
+func _has_approach_target() -> bool:
+	for node in get_tree().get_nodes_in_group("predator_wolf"):
+		if node is PredatorWolf and not (node as PredatorWolf).is_dead:
+			if InteractUtils.is_in_approach_range(self, node):
+				return true
+	for node in get_tree().get_nodes_in_group("partner_wolf"):
+		if node is PartnerWolf and not (node as PartnerWolf).is_dead:
+			if InteractUtils.is_in_mate_range(self, node):
+				return true
+	for node in get_tree().get_nodes_in_group("interact_handlers"):
+		if not node.has_method("handle_interact"):
+			continue
+		if node is FoodCarcass and (node as FoodCarcass).depleted:
+			continue
+		if node is WaterSource and (node as WaterSource).depleted:
+			continue
+		if InteractUtils.is_in_approach_range(self, node):
+			return true
+	return false
+
+
+func _pick_interact_target() -> Node:
+	var best_predator: PredatorWolf = null
+	var best_predator_dist := GameConstants.INTERACT_RANGE + 1.0
+	for node in get_tree().get_nodes_in_group("predator_wolf"):
+		if not node is PredatorWolf:
+			continue
+		var predator := node as PredatorWolf
+		if predator.is_dead:
+			continue
+		var dist := InteractUtils.distance_to(self, predator)
+		if dist <= GameConstants.INTERACT_RANGE and dist < best_predator_dist:
+			best_predator_dist = dist
+			best_predator = predator
+	if best_predator != null:
+		return best_predator
+
+	var best_partner: PartnerWolf = null
+	var best_partner_dist := GameConstants.MATE_RANGE + 1.0
+	for node in get_tree().get_nodes_in_group("partner_wolf"):
+		if not node is PartnerWolf:
+			continue
+		var partner := node as PartnerWolf
+		if partner.is_dead or GameState.gestation_active:
+			continue
+		var dist := InteractUtils.distance_to(self, partner)
+		if dist <= GameConstants.MATE_RANGE and dist < best_partner_dist:
+			best_partner_dist = dist
+			best_partner = partner
+	if best_partner != null:
+		return best_partner
+
+	var in_range: Array[Dictionary] = []
+	for node in get_tree().get_nodes_in_group("interact_handlers"):
+		if not node.has_method("handle_interact"):
+			continue
+		if node is PartnerWolf:
+			continue
+		if not InteractUtils.is_in_interact_range(self, node):
+			continue
+		if node is FoodCarcass and (node as FoodCarcass).depleted:
+			continue
+		if node is WaterSource and (node as WaterSource).depleted:
+			continue
+		in_range.append({"node": node, "dist": InteractUtils.distance_to(self, node)})
+
+	if in_range.is_empty():
+		return null
+
+	var want_food := needs.hunger <= needs.thirst
+	for entry in in_range:
+		var node: Node = entry["node"]
+		if want_food and node is FoodCarcass:
+			return node
+		if not want_food and node is WaterSource:
+			return node
+	for entry in in_range:
+		var node: Node = entry["node"]
+		if node is FoodCarcass or node is WaterSource:
+			return node
+
+	return in_range[0]["node"]
+
+
+func _fail_message_for(node: Node) -> void:
+	if node is PartnerWolf:
+		var partner := node as PartnerWolf
+		if GameState.gestation_active:
+			EventBus.ui_toast.emit("Already gestating — wait for birth", 2.0)
+		elif not InteractUtils.is_in_mate_range(self, partner):
+			EventBus.ui_toast.emit("Move closer to mate", 1.5)
+		elif GameConstants.MATE_REQUIRES_FED and not needs.is_fed_for_mate():
+			EventBus.ui_toast.emit("Need hunger & thirst above 50% to mate", 2.0)
+		elif GameConstants.MATE_REQUIRES_FED and not partner.needs.is_fed_for_mate():
+			EventBus.ui_toast.emit("Partner needs food and water first", 2.0)
+		else:
+			EventBus.ui_toast.emit("Cannot mate — try again", 1.5)
+	elif node is FoodCarcass:
+		EventBus.ui_toast.emit("Carcass depleted", 1.5)
+	elif node is WaterSource:
+		EventBus.ui_toast.emit("Water depleted", 1.5)
 
 
 func _apply_needs_damage(delta: float) -> void:

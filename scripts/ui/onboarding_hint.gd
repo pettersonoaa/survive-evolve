@@ -38,10 +38,10 @@ func _on_death(wolf, _cause: String) -> void:
 func _update_text() -> void:
 	match _step:
 		0:
-			_label.text = "WASD move. Find brown food and blue water — press E."
+			_label.text = "WASD move. E = eat, drink, bite predators, or mate."
 		1:
 			_label.text = "Find a partner (blood tag). Both need >50% needs. Press E to mate."
 		2:
-			_label.text = "Gestation 60s — needs drain slower. Stay fed!"
+			_label.text = "Gestation 60s — partner stays close. Protect them!"
 		3:
 			_label.text = "Choose an heir to continue your lineage."

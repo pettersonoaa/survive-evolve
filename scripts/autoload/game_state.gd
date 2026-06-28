@@ -5,6 +5,7 @@ var player_wolf: Node2D = null
 var living_heirs: Array[Node2D] = []
 var gestation_active: bool = false
 var gestation_time_left: float = 0.0
+var gestation_partner: PartnerWolf = null
 var pending_offspring: Dictionary = {}
 var pending_succession_after_gestation: bool = false
 var modal_ui_open: bool = false
@@ -16,6 +17,7 @@ func reset_for_new_run() -> void:
 	living_heirs.clear()
 	gestation_active = false
 	gestation_time_left = 0.0
+	gestation_partner = null
 	pending_offspring = {}
 	pending_succession_after_gestation = false
 	modal_ui_open = false

@@ -16,6 +16,8 @@ func _on_wolf_died(wolf, cause: String) -> void:
 	if wolf != GameState.player_wolf:
 		if wolf.is_heir:
 			GameState.unregister_heir(wolf)
+		elif wolf is PartnerWolf and GameState.gestation_partner == wolf:
+			GameState.gestation_partner = null
 		return
 
 	var heirs := GameState.get_living_heirs()

@@ -15,6 +15,7 @@
 | STEP-15 | yes | 2026-06-27 | Debug overlay K/M/R |
 | Combat | yes | 2026-06-27 | PredatorWolf ×2 |
 | Polish pass | yes | 2026-06-27 | UX: interact hints, toasts, health bar, pause on modals, gestation fix |
+| Bugfix pass | yes | 2026-06-27 | player_wolf reset race, mate range, HUD bars, heir needs, predator targets heirs |
 
 ## Agent review (post-polish estimated)
 

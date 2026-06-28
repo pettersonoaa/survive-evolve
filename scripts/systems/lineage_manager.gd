@@ -22,10 +22,11 @@ func _process(delta: float) -> void:
 func try_mate(player, partner: PartnerWolf) -> bool:
 	if GameState.gestation_active:
 		return false
-	if not InteractUtils.is_in_interact_range(player, partner):
+	if not InteractUtils.is_in_mate_range(player, partner):
 		return false
-	if not player.needs.is_fed_for_mate() or not partner.needs.is_fed_for_mate():
-		return false
+	if GameConstants.MATE_REQUIRES_FED:
+		if not player.needs.is_fed_for_mate() or not partner.needs.is_fed_for_mate():
+			return false
 
 	var child_node_id := EvolutionResolver.roll_child(player.current_node_id, partner.genes)
 	var offspring_stats := EvolutionResolver.build_offspring_stats(player, partner.genes, child_node_id)
@@ -41,6 +42,7 @@ func try_mate(player, partner: PartnerWolf) -> bool:
 	}
 	GameState.gestation_active = true
 	GameState.gestation_time_left = GESTATION_SECONDS
+	GameState.gestation_partner = partner
 	GameState.lineage.record_trait(trait_name)
 	EventBus.mate_started.emit(player, partner)
 	EventBus.evolution_applied.emit(player, child_node_id, trait_name)
@@ -50,6 +52,7 @@ func try_mate(player, partner: PartnerWolf) -> bool:
 
 func _finish_gestation() -> void:
 	GameState.gestation_active = false
+	GameState.gestation_partner = null
 	var data: Dictionary = GameState.pending_offspring
 	if data.is_empty():
 		return
@@ -97,10 +100,11 @@ func force_mate_debug() -> void:
 	if nearest == null:
 		EventBus.ui_toast.emit("Debug mate: no partner found", 1.5)
 		return
-	if not InteractUtils.is_in_interact_range(player, nearest):
+	if not InteractUtils.is_in_mate_range(player, nearest):
 		nearest.global_position = player.global_position + Vector2(36, 0)
-	player.needs.refill()
-	nearest.needs.refill()
+	if GameConstants.MATE_REQUIRES_FED:
+		player.needs.refill()
+		nearest.needs.refill()
 	if try_mate(player, nearest):
 		EventBus.ui_toast.emit("Debug mate: gestation started", 2.0)
 	else:

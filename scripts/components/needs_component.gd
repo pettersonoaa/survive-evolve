@@ -25,12 +25,15 @@ func _process(delta: float) -> void:
 		thirst_mult = wolf.get_thirst_decay_mult()
 
 	var decay_scale := 1.0
-	if wolf != null and wolf.get_script() != null:
-		var script_path: String = wolf.get_script().resource_path
-		if script_path.ends_with("player_wolf.gd"):
+	if wolf != null:
+		if wolf.get("is_player_controlled"):
 			decay_scale *= GameConstants.PLAYER_NEEDS_DECAY_MULT
 			if GameState.gestation_active:
 				decay_scale *= 0.35
+		elif wolf.get_script() != null:
+			var script_path: String = wolf.get_script().resource_path
+			if script_path.ends_with("son_wolf.gd") and wolf.is_heir:
+				decay_scale *= GameConstants.HEIR_NEEDS_DECAY_MULT
 
 	hunger = maxf(hunger - hunger_decay_per_sec * metabolism * hunger_mult * decay_scale * delta, 0.0)
 	thirst = maxf(thirst - thirst_decay_per_sec * metabolism * thirst_mult * decay_scale * delta, 0.0)
@@ -65,6 +68,8 @@ func drink(amount: float) -> void:
 
 
 func is_fed_for_mate() -> bool:
+	if not GameConstants.MATE_REQUIRES_FED:
+		return true
 	return hunger > 50.0 and thirst > 50.0
 
 

@@ -19,56 +19,69 @@ const COLOR_BAR_BG := Color(0.12, 0.12, 0.14, 0.92)
 @onready var _thirst: ProgressBar = $Panel/ThirstBar
 
 var _damage_flash := 0.0
-var _health_fill := StyleBoxFlat.new()
-var _hunger_fill := StyleBoxFlat.new()
-var _thirst_fill := StyleBoxFlat.new()
 
 
 func _ready() -> void:
 	EventBus.wolf_damaged.connect(_on_damaged)
-	_setup_bar(_health, _health_fill)
-	_setup_bar(_hunger, _hunger_fill)
-	_setup_bar(_thirst, _thirst_fill)
+	for bar in [_health, _hunger, _thirst]:
+		bar.min_value = 0.0
+		bar.max_value = 100.0
+		bar.step = 0.1
+		bar.show_percentage = false
+		_apply_bar_theme(bar)
 
 
-func _setup_bar(bar: ProgressBar, fill_style: StyleBoxFlat) -> void:
+func _apply_bar_theme(bar: ProgressBar) -> void:
 	var bg := StyleBoxFlat.new()
 	bg.bg_color = COLOR_BAR_BG
 	bg.set_corner_radius_all(5)
 	bg.set_border_width_all(1)
 	bg.border_color = Color(0.35, 0.35, 0.38)
-	fill_style.set_corner_radius_all(4)
+	var fill := StyleBoxFlat.new()
+	fill.set_corner_radius_all(4)
 	bar.add_theme_stylebox_override("background", bg)
-	bar.add_theme_stylebox_override("fill", fill_style)
-	bar.show_percentage = false
+	bar.add_theme_stylebox_override("fill", fill)
 
 
 func _process(delta: float) -> void:
 	var wolf := GameState.player_wolf
-	if wolf == null or not is_instance_valid(wolf):
+	if wolf == null or not is_instance_valid(wolf) or not wolf is Wolf:
+		return
+	var w: Wolf = wolf as Wolf
+	if w.needs == null:
 		return
 
-	var health_pct: float = wolf.health / wolf.stats.max_health * 100.0
-	var hunger_pct: float = wolf.needs.hunger
-	var thirst_pct: float = wolf.needs.thirst
+	var health_pct: float = w.health / w.stats.max_health * 100.0
+	var hunger_pct: float = w.needs.hunger
+	var thirst_pct: float = w.needs.thirst
 
-	_health.value = health_pct
-	_hunger.value = hunger_pct
-	_thirst.value = thirst_pct
+	_set_bar(_health, health_pct, COLOR_HEALTH_OK, COLOR_HEALTH_WARN, COLOR_HEALTH_CRIT)
+	_set_bar(_hunger, hunger_pct, COLOR_HUNGER_OK, COLOR_HUNGER_WARN, COLOR_HUNGER_CRIT)
+	_set_bar(_thirst, thirst_pct, COLOR_THIRST_OK, COLOR_THIRST_WARN, COLOR_THIRST_CRIT)
 
 	_health_label.text = _bar_text("Health", health_pct, _state_for(health_pct))
 	_hunger_label.text = _bar_text("Hunger", hunger_pct, _state_for(hunger_pct))
 	_thirst_label.text = _bar_text("Thirst", thirst_pct, _state_for(thirst_pct))
 
-	_set_fill_color(_health_fill, health_pct, COLOR_HEALTH_OK, COLOR_HEALTH_WARN, COLOR_HEALTH_CRIT)
-	_set_fill_color(_hunger_fill, hunger_pct, COLOR_HUNGER_OK, COLOR_HUNGER_WARN, COLOR_HUNGER_CRIT)
-	_set_fill_color(_thirst_fill, thirst_pct, COLOR_THIRST_OK, COLOR_THIRST_WARN, COLOR_THIRST_CRIT)
-
 	if _damage_flash > 0.0:
 		_damage_flash -= delta
-		_health_fill.bg_color = COLOR_HEALTH_CRIT.lightened(0.15)
+		var fill := _health.get_theme_stylebox("fill") as StyleBoxFlat
+		if fill != null:
+			fill.bg_color = COLOR_HEALTH_CRIT.lightened(0.15)
+
+
+func _set_bar(bar: ProgressBar, value: float, ok: Color, warn: Color, crit: Color) -> void:
+	bar.value = clampf(value, 0.0, 100.0)
+	var fill := bar.get_theme_stylebox("fill") as StyleBoxFlat
+	if fill == null:
+		return
+	if value <= 25.0:
+		fill.bg_color = crit
+	elif value <= 50.0:
+		fill.bg_color = warn
 	else:
-		_set_fill_color(_health_fill, health_pct, COLOR_HEALTH_OK, COLOR_HEALTH_WARN, COLOR_HEALTH_CRIT)
+		fill.bg_color = ok
+	bar.queue_redraw()
 
 
 func _bar_text(name: String, value: float, state: String) -> String:
@@ -81,15 +94,6 @@ func _state_for(value: float) -> String:
 	if value <= 50.0:
 		return "LOW"
 	return "OK"
-
-
-func _set_fill_color(style: StyleBoxFlat, value: float, ok: Color, warn: Color, crit: Color) -> void:
-	if value <= 25.0:
-		style.bg_color = crit
-	elif value <= 50.0:
-		style.bg_color = warn
-	else:
-		style.bg_color = ok
 
 
 func _on_damaged(wolf: Node, _amount: float) -> void:

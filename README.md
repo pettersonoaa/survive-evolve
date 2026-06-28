@@ -31,7 +31,7 @@ A **2.5D** roguelike / survivor game inspired by the depth and pixel look of [Ro
 | Key | Action |
 |-----|--------|
 | WASD / arrows | Move |
-| E | Eat, drink, or mate (nearest target) |
+| E | Eat, drink, **bite predators**, or mate |
 | K | Debug: kill player |
 | R | Debug: refill needs |
 | M | Debug: force mate |
@@ -62,4 +62,4 @@ survive-evolve/
 
 ## Status
 
-2.5D movement prototype with placeholder shapes — combat and evolution next.
+Playable wolf lineage prototype (STEP-01–16). Placeholder art until STEP-20.

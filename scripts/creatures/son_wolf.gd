@@ -10,7 +10,8 @@ func _ready() -> void:
 	is_heir = true
 	body_color = Color(0.62, 0.62, 0.65)
 	super._ready()
-	needs.set_process(false)
+	needs.set_process(true)
+	needs.refill()
 	GameState.register_heir(self)
 	_follow_target = GameState.player_wolf
 
@@ -27,12 +28,7 @@ func setup_from_birth(birth_stats: WolfStats, node_id: String, partner_genes: Wo
 		_update_geometry()
 
 
-func _process(delta: float) -> void:
-	if is_dead:
-		return
-	super._process(delta)
-	if is_player_controlled:
-		return
+func _follow_as_heir(delta: float) -> void:
 	if _follow_target == null or not is_instance_valid(_follow_target):
 		_follow_target = GameState.player_wolf
 	if _follow_target == null:
@@ -50,7 +46,11 @@ func promote_to_player() -> void:
 		global_position = Vector2.ZERO
 	is_player_controlled = true
 	is_heir = false
+	set_process(true)
+	needs.set_process(true)
+	needs.refill()
 	GameState.unregister_heir(self)
 	GameState.player_wolf = self
 	body_color = Color(0.55, 0.55, 0.58)
 	_body.color = body_color
+	_attack_cooldown = 0.0

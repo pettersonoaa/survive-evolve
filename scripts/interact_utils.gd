@@ -24,3 +24,7 @@ static func is_in_interact_range(player: Node2D, target: Node2D) -> bool:
 
 static func is_in_approach_range(player: Node2D, target: Node2D) -> bool:
 	return distance_to(player, target) <= GameConstants.APPROACH_HINT_RANGE
+
+
+static func is_in_mate_range(player: Node2D, target: Node2D) -> bool:
+	return distance_to(player, target) <= GameConstants.MATE_RANGE
