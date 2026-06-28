@@ -35,12 +35,16 @@ func _process(delta: float) -> void:
 				decay_scale *= 0.35
 		elif wolf is PartnerWolf:
 			decay_scale *= GameConstants.PARTNER_NEEDS_DECAY_MULT
-		elif wolf.get_script() != null:
-			var script_path: String = wolf.get_script().resource_path
-			if script_path.ends_with("son_wolf.gd") and wolf.is_heir:
+		elif wolf is SonWolf:
+			var son := wolf as SonWolf
+			if son.is_pack_dependent():
 				decay_scale *= GameConstants.HEIR_NEEDS_DECAY_MULT
 				if InteractUtils.den_covers(wolf.get_tree(), wolf.global_position):
 					decay_scale *= GameConstants.DEN_NEEDS_DECAY_MULT
+			elif son.life_stage == SonWolf.LifeStage.INDEPENDENT:
+				decay_scale *= GameConstants.HEIR_INDEPENDENT_NEEDS_DECAY_MULT
+			elif son.life_stage == SonWolf.LifeStage.ROGUE:
+				decay_scale *= 0.75
 
 	hunger = maxf(hunger - hunger_decay_per_sec * metabolism * hunger_mult * decay_scale * delta, 0.0)
 	thirst = maxf(thirst - thirst_decay_per_sec * metabolism * thirst_mult * decay_scale * delta, 0.0)

@@ -125,7 +125,17 @@ func get_pack_size() -> int:
 	for node in get_tree().get_nodes_in_group("partner_wolf"):
 		if node is PartnerWolf and is_instance_valid(node) and not node.is_dead:
 			count += 1
-	count += get_living_heirs().size()
+	count += get_dependent_pup_count()
+	return count
+
+
+func get_dependent_pup_count() -> int:
+	var count := 0
+	for heir in get_living_heirs():
+		if heir is SonWolf:
+			var son := heir as SonWolf
+			if son.is_pack_dependent():
+				count += 1
 	return count
 
 
@@ -139,6 +149,6 @@ func get_pack_members(include_player: bool = false) -> Array[Wolf]:
 		if node is PartnerWolf and is_instance_valid(node) and not node.is_dead:
 			members.append(node as Wolf)
 	for heir in get_living_heirs():
-		if heir is Wolf:
+		if heir is SonWolf and (heir as SonWolf).is_pack_dependent():
 			members.append(heir as Wolf)
 	return members

@@ -575,32 +575,18 @@ World (world_25d.gd)
 
 ## 9. Out of scope for prototype (DO NOT BUILD)
 
-- Combat / prey hunting AI
-- Pack mechanics, rival wolves
-- Day/night, seasons, territory
-- Persistent save between app restarts
 - Multiplayer
-- Real sprite art (STEP-20+ future)
-- More than one species
+- More than one playable species
+- Full procedural terrain generation (scatter only)
+- Real authored sprite art required (atlas drop-in supported)
+
+**Note:** Items once listed here but now shipped: combat/predators, pack mechanics, day/night, save/load, main menu, resource respawn, procedural scatter on New Lineage.
 
 ---
 
-## 10. Future steps (post-prototype, not for current agents)
+## 10. Completed step index (historical)
 
-| ID | Summary |
-|----|---------|
-| STEP-20 | Replace placeholders with wolf `Sprite2D` sheets |
-| STEP-21 | Prey animal + hunt loop |
-| STEP-22 | Den/home safe zone for son |
-| STEP-23 | Save/load lineage + tree to disk |
-| STEP-24 | Second biome + second partner archetype |
-| STEP-25 | Main menu (Continue / New lineage) |
-| STEP-26 | Expanded map scope (DEC-21) |
-| STEP-27 | Sprite atlas pipeline (Aseprite drop-in) |
-| STEP-28 | Idle / walk animation |
-| STEP-29 | Resource respawn |
-| STEP-30 | Day / night cycle |
-| STEP-31 | Pack assist combat |
+Steps STEP-01–16 (core), STEP-20–31 (content/polish), STEP-32–35 (Phase 3 meta), STEP-36–38 (pack + lifecycle). See `PROTOTYPE_STATUS.md` for dates and notes.
 
 ---
 
@@ -626,6 +612,31 @@ World (world_25d.gd)
 ### STEP-34 VERIFY
 
 1. After several generations, predators deal more damage and move faster (observe HUD threat tier + combat).
+
+---
+
+## 13. Phase 4 — pack & pup lifecycle
+
+| ID | Summary |
+|----|---------|
+| STEP-36 | `PackNeedsManager` + `PackHUD` — shared feeding for player + partners + **dependent pups**; pack-size difficulty scaling |
+| STEP-37 | Litters **1–3** per gestation; siblings share trait; spawn cluster beside mother |
+| STEP-38 | `SonWolf` lifecycle: **Pup** (50s) → **Young wolf** (independent, self-feeds) → **Rogue** (+70s, hostile, still genetic heir) |
+
+### STEP-36 VERIFY
+
+1. Mate → Pack HUD shows partner + pup hunger/thirst.
+2. Player eats → pack bars rise together (dependent pups only).
+
+### STEP-37 VERIFY
+
+1. Mate several times — birth toast may show 2–3 pups.
+2. Pups spawn next to gestating partner, not at den.
+
+### STEP-38 VERIFY
+
+1. Wait ~50s after birth — toast: pup left the pack; removed from Pack HUD.
+2. Wait ~70s more — rogue toast; pup attacks; still appears in heir picker on death.
 
 ---
 

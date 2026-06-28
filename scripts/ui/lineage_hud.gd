@@ -22,7 +22,7 @@ func _process(delta: float) -> void:
 		_gen_label.text = "Gen: %d" % GameState.lineage.generation
 		_trait_label.text = "Trait: %s" % wolf.trait_display_name
 		GameState.prune_dead_heirs()
-		_heir_label.text = "Heirs: %d" % GameState.living_heirs.size()
+		_heir_label.text = "Heirs: %d (pack %d)" % [GameState.living_heirs.size(), GameState.get_dependent_pup_count()]
 		_threat_label.text = "Threat: %s (pack %d)" % [_threat_tier(), GameState.get_pack_size()]
 	if GameState.gestation_active:
 		var parts: PackedStringArray = []

@@ -209,7 +209,7 @@ func _test_lineage_save() -> void:
 		_fail("lineage save test: file not written")
 		return
 	var data := LineageSave._read_save()
-	if int(data.get("version", 0)) != 2:
+	if int(data.get("version", 0)) != 3:
 		_fail("lineage save test: bad version")
 		return
 	var player_data: Dictionary = data.get("player", {})

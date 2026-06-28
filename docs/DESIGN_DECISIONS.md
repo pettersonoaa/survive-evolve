@@ -19,7 +19,7 @@ Tell agents: *"Follow docs/DESIGN_DECISIONS.md"*
 | **Evolution** | At **mate time** (gestation **30s**), per-wolf tree position |
 | **Victory** | Reach max evolution node → lineage “complete” (game over win) |
 | **Survival** | Press **E** to eat/drink; resources deplete then **respawn ~90s** |
-| **Pack** | Partners + pups share hunger/thirst; player feeding feeds the pack |
+| **Pack** | Player feeding sustains partners + **dependent pups** only |
 | **Combat** | Starvation, dehydration, **predators** (scale with generation + pack size) |
 | **World** | Large map (48-tile radius), **procedural scatter** on New Lineage, biomes + hunt |
 | **Meta** | **Lineage Codex** persists discovered traits across runs; gameplay resets on New Lineage |
@@ -326,9 +326,11 @@ Visible tags on partners and in birth toasts (DEC-18). Full weights in `docs/EVO
 
 | Topic | Behavior |
 |-------|----------|
-| Pack members | Player + wandering partners + living pups |
-| Needs UI | Player `NeedsHUD` + `PackHUD` for partners/pups |
-| Feeding | Player E-interact feeds entire pack |
+| Pack members | Player + partners + **dependent pups only** |
+| Pup lifecycle | **Pup** (pack-fed, grows) → **Young wolf** (independent, self-feeds) → **Rogue** (hostile, still genetic heir) |
+| Independence | ~**50s** after birth — leaves pack, hunts food/water alone |
+| Rogue | ~**70s** after independence — attacks pack; still selectable as heir on death |
+| Feeding | Player E-interact feeds **dependent pups** + partners only |
 | Difficulty | More pack members → higher needs pressure + more predators + threat tier |
 | Den | Safe zone for pups (reduced decay); **birth is at mother**, not den |
 | Pack assist | Gestation partner joins player bites; pups assist when heir |
@@ -369,4 +371,6 @@ Visible tags on partners and in birth toasts (DEC-18). Full weights in `docs/EVO
 | Date | Change |
 |------|--------|
 | 2026-06-27 | Initial lock (DEC-01–21) |
-| 2026-06-28 | Gestation 30s; litters 1–3; multi-gestation; birth at mother; pack feeding; respawn 90s; codex meta; procedural scatter; predator/pack scaling; desert partner; hunt loop; save/load |
+| 2026-06-28 | Phase 3: procedural scatter, codex, predator scaling, threat HUD |
+| 2026-06-28 | Pack loop: shared feeding, multi-gestation, litters 1–3, birth at mother |
+| 2026-06-28 | Pup lifecycle: grow → independent → rogue heir; save v3 |

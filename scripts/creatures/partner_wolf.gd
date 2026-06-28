@@ -73,7 +73,10 @@ func _is_gestation_partner() -> bool:
 
 func _has_living_offspring() -> bool:
 	_prune_offspring_guard()
-	return not _offspring_guard.is_empty()
+	for son in _offspring_guard:
+		if is_instance_valid(son) and not son.is_dead and son.is_pack_dependent():
+			return true
+	return false
 
 
 func _prune_offspring_guard() -> void:

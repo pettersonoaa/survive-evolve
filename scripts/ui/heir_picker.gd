@@ -20,7 +20,7 @@ func open_picker(heirs: Array, from_wolf) -> void:
 		if heir == null:
 			continue
 		var btn := Button.new()
-		btn.text = "Heir %d — %s" % [i + 1, heir.trait_display_name]
+		btn.text = "%s — %s" % [heir.get_life_stage_label(), heir.trait_display_name]
 		btn.pressed.connect(_on_heir_chosen.bind(heir))
 		list.add_child(btn)
 

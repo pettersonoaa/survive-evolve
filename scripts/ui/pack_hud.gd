@@ -101,7 +101,8 @@ func _member_name(member: Wolf) -> String:
 	if member is PartnerWolf:
 		return (member as PartnerWolf).genes.display_tag
 	if member is SonWolf:
-		return "Pup: %s" % member.trait_display_name
+		var son := member as SonWolf
+		return "%s: %s" % [son.get_life_stage_label(), member.trait_display_name]
 	return member.trait_display_name
 
 

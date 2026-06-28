@@ -1,7 +1,7 @@
 extends Node
 
 const SAVE_PATH := "user://lineage_save.json"
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 const AUTOSAVE_INTERVAL := 45.0
 
 var _skip_load_once := false
@@ -87,7 +87,7 @@ func save_run() -> void:
 	var heirs_data: Array = []
 	for heir in GameState.get_living_heirs():
 		if heir is Wolf and is_instance_valid(heir):
-			heirs_data.append(_serialize_wolf(heir as Wolf))
+			heirs_data.append(_serialize_heir(heir as Wolf))
 
 	var data := {
 		"version": SAVE_VERSION,
@@ -142,6 +142,13 @@ func load_into_world(world: Node2D) -> void:
 		var son: SonWolf = _son_scene.instantiate() as SonWolf
 		ysort.add_child(son)
 		_apply_wolf_data(son, heir_data)
+		if son is SonWolf:
+			var stage := int(heir_data.get("life_stage", SonWolf.LifeStage.PUP))
+			son.restore_lifecycle(
+				stage as SonWolf.LifeStage,
+				float(heir_data.get("age_seconds", 0.0)),
+				float(heir_data.get("independent_age_seconds", 0.0)),
+			)
 		son.global_position = Vector2(
 			float(heir_data.get("pos_x", 0.0)),
 			float(heir_data.get("pos_y", 0.0))
@@ -260,6 +267,16 @@ func _apply_gestation(data: Dictionary) -> void:
 		"partner": partner,
 		"pending": pending,
 	})
+
+
+func _serialize_heir(wolf: Wolf) -> Dictionary:
+	var data := _serialize_wolf(wolf)
+	if wolf is SonWolf:
+		var son := wolf as SonWolf
+		data["life_stage"] = son.life_stage
+		data["age_seconds"] = son.age_seconds
+		data["independent_age_seconds"] = son._independent_age_seconds
+	return data
 
 
 func _serialize_wolf(wolf: Wolf) -> Dictionary:

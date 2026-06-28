@@ -9,6 +9,7 @@ func _ready() -> void:
 	add_to_group("difficulty_scaler")
 	EventBus.succession_started.connect(func(_a, _b): _apply_scaling())
 	EventBus.mate_completed.connect(func(_a, _b, _c): _apply_scaling())
+	EventBus.heir_lifecycle_changed.connect(func(_a, _b): _apply_scaling())
 	call_deferred("_apply_scaling")
 
 

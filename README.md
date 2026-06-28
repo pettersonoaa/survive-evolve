@@ -1,65 +1,76 @@
 # Survive now, evolve if you can
 
-A **2.5D** roguelike / survivor game inspired by the depth and pixel look of [Romestead](https://store.steampowered.com/app/2660460/Romestead/). Survive waves, mutate, evolve—or die trying.
+A **2.5D** wolf lineage roguelike inspired by the depth and pixel look of [Romestead](https://store.steampowered.com/app/2660460/Romestead/). Survive hunger, raise a pack, evolve your bloodline—or die without heirs.
 
 ## Visual direction (Romestead-like)
 
 - **Top-down** camera with **Y-sorted depth** (walk behind trees, in front of rocks)
 - **Feet-based sorting** — entity root sits on the ground; the sprite sits above
-- **Projected pixel art** pipeline (see `docs/ART_PIPELINE.md`) once we move past placeholders
+- **Sprite atlas** pipeline with procedural fallback (`assets/sprites/wolf/`)
 - Nearest-neighbor filtering for crisp pixels
 
 ## Gameplay pillars
 
-- **Survive now** — movement, dodge, escalating pressure
-- **Evolve if you can** — risky mutations, run-based builds
-- **Readable crowds** — depth + telegraphs matter in survivor combat
+- **Survive now** — hunger, thirst, predators, pack pressure
+- **Evolve if you can** — mate-time evolution on a 34-node wolf tree
+- **Lineage** — multiple pups per life; choose your heir when you die
 
 ## Stack
 
-- [Godot 4.3+](https://godotengine.org/) (GDScript)
+- [Godot 4.7](https://godotengine.org/) (GDScript)
 - Desktop first
 
 ## Run the prototype
 
 1. Open this folder in Godot 4.7 (`project.godot`).
-2. Press **F5**.
-3. **WASD** — move | **E** — interact (food, water, mate)
+2. Press **F5** (main menu).
+3. **New Lineage** or **Continue**.
 
 ### Controls
 
 | Key | Action |
 |-----|--------|
 | WASD / arrows | Move |
-| E | Eat, drink, **bite predators**, or mate |
+| E | Eat, drink, hunt deer, bite predators / rogue heirs, mate |
 | K | Debug: kill player |
 | R | Debug: refill needs |
 | M | Debug: force mate |
 
-### Prototype loop
+### Core loop
 
-Survive hunger/thirst → find a wandering partner (forest/plains/tundra) → mate (60s gestation) → son born with evolution trait → die → play as heir → repeat or game over without heirs.
+Survive needs → mate wandering partners (up to one gestation each) → **30s gestation** → **1–3 pups** beside the mother → feed the pack → pups grow independent → some turn rogue → die → play as heir or game over.
+
+See `docs/PROTOTYPE_STATUS.md` for the full playtest checklist.
 
 ## Layout
 
 ```
 survive-evolve/
-├── assets/              # final sprites, audio (Blender exports, Aseprite)
+├── assets/sprites/wolf/   # optional Aseprite drop-in sheet
 ├── scenes/
-│   ├── world.tscn       # 2.5D play space
-│   ├── entity_25d.tscn  # base feet + visual + shadow
-│   ├── player.tscn
-│   └── prop_*.tscn
+│   ├── world.tscn
+│   ├── ui/main_menu.tscn
+│   └── creatures/
 ├── scripts/
-│   ├── entity_25d.gd    # depth / lift / shadow
-│   ├── player.gd
-│   └── ...
+│   ├── autoload/          # EventBus, GameState, LineageSave, LineageCodex
+│   ├── systems/           # lineage, pack needs, world generator
+│   └── creatures/         # wolf, partner, son, predator
 └── docs/
-    ├── ART_PIPELINE.md
-    ├── RENDERING_25D.md
+    ├── DESIGN_DECISIONS.md   # locked design (read first)
+    ├── PROTOTYPE_PLAN.md
+    ├── PROTOTYPE_STATUS.md
     └── GAME_CONCEPT.md
 ```
 
 ## Status
 
-Playable wolf lineage prototype (STEP-01–16). Placeholder art until STEP-20.
+**Playable prototype** through STEP-38: pack feeding, litters, pup lifecycle (pup → independent → rogue), procedural runs, save/load, lineage codex. Authoritative design: `docs/DESIGN_DECISIONS.md`.
+
+## Tests (headless)
+
+```bash
+godot --path . --headless res://scenes/test/integration_runner.tscn
+godot --path . --headless res://scenes/test/gestation_succession_test.tscn
+```
+
+Expect `INTEGRATION_PASS` and `GESTATION_FIX_PASS`.

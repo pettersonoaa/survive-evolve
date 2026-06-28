@@ -12,6 +12,15 @@ func _process(_delta: float) -> void:
 	var best_text := ""
 	var best_dist := 9999.0
 
+	for heir in GameState.get_living_heirs():
+		if heir is SonWolf and (heir as SonWolf).is_hostile():
+			var rogue := heir as SonWolf
+			var dist := InteractUtils.distance_to(wolf, rogue)
+			if dist > GameConstants.INTERACT_RANGE or dist >= best_dist:
+				continue
+			best_dist = dist
+			best_text = "[E] Bite rogue heir"
+
 	for node in get_tree().get_nodes_in_group("predator_wolf"):
 		if not node is PredatorWolf:
 			continue

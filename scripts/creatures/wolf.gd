@@ -104,6 +104,10 @@ func _has_approach_target() -> bool:
 		if node is PredatorWolf and not (node as PredatorWolf).is_dead:
 			if InteractUtils.is_in_approach_range(self, node):
 				return true
+	for heir in GameState.get_living_heirs():
+		if heir is SonWolf and (heir as SonWolf).is_hostile():
+			if InteractUtils.is_in_approach_range(self, heir):
+				return true
 	for node in get_tree().get_nodes_in_group("prey_animal"):
 		if node.get("is_dead"):
 			continue
@@ -140,6 +144,14 @@ func _pick_interact_target() -> Node:
 			best_predator = predator
 	if best_predator != null:
 		return best_predator
+
+	for heir in GameState.get_living_heirs():
+		if heir is SonWolf and (heir as SonWolf).is_hostile():
+			var rogue := heir as SonWolf
+			var dist := InteractUtils.distance_to(self, rogue)
+			if dist <= GameConstants.INTERACT_RANGE and dist < best_predator_dist:
+				best_predator_dist = dist
+				return rogue
 
 	var best_prey: Node = null
 	var best_prey_dist := GameConstants.INTERACT_RANGE + 1.0
